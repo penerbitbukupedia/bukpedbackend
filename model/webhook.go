@@ -56,10 +56,11 @@ type Project struct {
 }
 
 type MenuItem struct {
-	ID    string `json:"id" bson:"id"`
-	Name  string `json:"name" bson:"name"`
-	Price int    `json:"price" bson:"price"`
-	Image string `json:"image" bson:"image"`
+	IDDatabase primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	ID         string             `json:"id" bson:"id"`
+	Name       string             `json:"name" bson:"name"`
+	Price      int                `json:"price" bson:"price"`
+	Image      string             `json:"image" bson:"image"`
 }
 
 type Userdomyikado struct {

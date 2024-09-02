@@ -267,7 +267,7 @@ func GetDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 	at.WriteJSON(respw, http.StatusOK, existingprjs)
 }
 
-func PostDataMemberProject(respw http.ResponseWriter, req *http.Request) {
+func PostDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 	var respn model.Response
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
 	if err != nil {
@@ -278,7 +278,7 @@ func PostDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusForbidden, respn)
 		return
 	}
-	var idprjuser model.Userdomyikado
+	var idprjuser model.MenuItem
 	err = json.NewDecoder(req.Body).Decode(&idprjuser)
 	if err != nil {
 		respn.Status = "Error : Body tidak valid"
@@ -300,17 +300,10 @@ func PostDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusNotFound, respn)
 		return
 	}
-	docusermember, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": idprjuser.PhoneNumber})
+	//bikin insert menu
+	rest, err := atdb.AddDocToArray[model.MenuItem](config.Mongoconn, "project", idprjuser.IDDatabase, "members", idprjuser)
 	if err != nil {
-		respn.Status = "Error : Data member tidak di temukan"
-		respn.Response = err.Error()
-		at.WriteJSON(respw, http.StatusConflict, respn)
-		return
-	}
-	docusermember.Poin = 0 //set user poin per project, jika baru dimasukkan maka set0 karena belum ada kontribusi di project ini
-	rest, err := atdb.AddDocToArray[model.Userdomyikado](config.Mongoconn, "project", idprjuser.ID, "members", docusermember)
-	if err != nil {
-		respn.Status = "Error : Gagal menambahkan member ke project"
+		respn.Status = "Error : Gagal menambahkan menu ke lapak"
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusExpectationFailed, respn)
 		return
