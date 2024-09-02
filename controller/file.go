@@ -33,8 +33,9 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		at.WriteJSON(w, http.StatusNotImplemented, respn)
 		return
 	}
-	lapakname := at.GetParam(r)
-	_, err = atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": lapakname})
+	lapakid := at.GetParam(r)
+	objectId, _ := primitive.ObjectIDFromHex(lapakid)
+	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"_id": objectId})
 	if err != nil {
 		var respn model.Response
 		respn.Status = "Error : Data lapak tidak di temukan"
@@ -64,7 +65,7 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	GitHubAuthorEmail := "awangga@gmail.com"
 	githubOrg := "jualinmang"
 	githubRepo := "img"
-	pathFile := lapakname + "/menu/" + hashedFileName + header.Filename[strings.LastIndex(header.Filename, "."):] // Append the original file extension
+	pathFile := prj.Name + "/menu/" + hashedFileName + header.Filename[strings.LastIndex(header.Filename, "."):] // Append the original file extension
 	replace := true
 
 	// Use GithubUpload function to upload the file to GitHub

@@ -19,7 +19,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	case method == "GET" && path == "/":
 		controller.GetHome(w, r)
 	//upload gambar menu
-	case method == "POST" && at.URLParam(path, "/upload/menu/:lapakname"):
+	case method == "POST" && at.URLParam(path, "/upload/menu/:lapakid"):
 		controller.MenuUploadFileHandler(w, r)
 	//chat bot inbox
 	case method == "POST" && at.URLParam(path, "/webhook/nomor/:nomorwa"):
