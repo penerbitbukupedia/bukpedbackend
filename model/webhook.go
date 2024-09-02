@@ -43,11 +43,11 @@ type PushReport struct {
 
 type Project struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Secret      string             `bson:"secret" json:"secret"`
+	Secret      string             `bson:"secret,omitempty" json:"secret,omitempty"`
 	Name        string             `bson:"name" json:"name"`
 	Title       string             `bson:"title" json:"title"`
 	Description string             `bson:"description" json:"description"`
-	Owner       Userdomyikado      `bson:"owner" json:"owner"`
+	Owner       Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
 	WAGroupID   string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
 	RepoOrg     string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
 	RepoLogName string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
