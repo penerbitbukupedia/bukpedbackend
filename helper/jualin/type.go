@@ -19,3 +19,10 @@ type PaymentRequest struct {
 	Payment       string  `json:"payment" bson:"payment"`
 	PaymentMethod string  `json:"paymentMethod" bson:"paymentMethod"`
 }
+
+type MenuItem struct {
+	ID    string `json:"id" bson:"id"`
+	Name  string `json:"name" bson:"name"`
+	Price int    `json:"price" bson:"price"`
+	Image string `json:"image" bson:"image"`
+}

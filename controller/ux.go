@@ -446,8 +446,8 @@ func PostMeeting(w http.ResponseWriter, r *http.Request) {
 	lap.Solusi = event.Description
 	//mengambil daftar email dari project member
 	var attendees []string
-	for _, member := range prjuser.Members {
-		attendees = append(attendees, member.Email)
+	for _, member := range prjuser.Menu {
+		attendees = append(attendees, member.Name)
 	}
 	event.Attendees = attendees
 

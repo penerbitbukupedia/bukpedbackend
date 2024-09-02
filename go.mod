@@ -8,7 +8,6 @@ require (
 	github.com/RadhiFadlillah/go-sastrawi v0.0.0-20200621225627-3dd6e0e1ac00
 	github.com/aiteung/atdb v0.1.7
 	github.com/go-playground/webhooks v5.17.0+incompatible
-	github.com/go-playground/webhooks/v6 v6.3.0
 	github.com/google/go-github/v59 v59.0.0
 	github.com/kimseokgis/backend-ai v0.0.0-20240731161356-5480aad28fd3
 	github.com/raykov/gofpdf v1.16.7

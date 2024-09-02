@@ -68,7 +68,7 @@ func CountDuplicatePhoneNumbersWithName(reports []model.PushReport) map[string]P
 	phoneNumberCount := make(map[string]PhoneNumberInfo)
 
 	for _, report := range reports {
-		phoneNumber := report.User.PhoneNumber
+		phoneNumber := report.User.ID
 		if phoneNumber != "" {
 			if info, exists := phoneNumberCount[phoneNumber]; exists {
 				info.Count++
@@ -91,7 +91,7 @@ func CountDuplicatePhoneNumbers(reports []model.PushReport) map[string]int {
 	phoneNumberCount := make(map[string]int)
 
 	for _, report := range reports {
-		phoneNumber := report.User.PhoneNumber
+		phoneNumber := report.User.ID
 		if phoneNumber != "" {
 			phoneNumberCount[phoneNumber]++
 		}

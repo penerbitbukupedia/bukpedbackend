@@ -85,11 +85,13 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	case method == "POST" && path == "/data/tiket/rate":
 		controller.PostMasukanTiket(w, r)
 
-	//disabel pendaftaran
-	//case method == "POST" && path == "/data/user":
-	//	controller.PostDataUser(w, r)
-	//case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
-	//	controller.PostDataUserFromWA(w, r)
+		//disabel pendaftaran
+		//case method == "POST" && path == "/data/user":
+		//	controller.PostDataUser(w, r)
+		//case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
+		//	controller.PostDataUserFromWA(w, r)
+	case method == "GET" && path == "/data/proyek":
+		controller.GetDataProject(w, r)
 	case method == "POST" && path == "/data/proyek":
 		controller.PostDataProject(w, r)
 	case method == "PUT" && path == "/data/proyek":
@@ -104,10 +106,6 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.ApproveBimbinganbyPoin(w, r)
 	case method == "DELETE" && path == "/data/proyek/anggota":
 		controller.DeleteDataMemberProject(w, r)
-	case method == "POST" && at.URLParam(path, "/webhook/github/:proyek"):
-		controller.PostWebHookGithub(w, r)
-	case method == "POST" && at.URLParam(path, "/webhook/gitlab/:proyek"):
-		controller.PostWebHookGitlab(w, r)
 	case method == "POST" && path == "/notif/ux/postlaporan":
 		controller.PostLaporan(w, r)
 	case method == "POST" && path == "/notif/ux/postfeedback":

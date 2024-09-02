@@ -71,14 +71,14 @@ func GenerateRekapMessageKemarinPerWAGroupID(db *mongo.Database, groupId string)
 
 		// Iterasi melalui nomor telepon dalam dokumen MongoDB
 		for _, doc := range projectDocuments {
-			for _, member := range doc.Members {
-				phoneNumber := member.PhoneNumber
+			for _, member := range doc.Menu {
+				phoneNumber := member.ID
 				// Periksa apakah nomor telepon ada dalam map
 				if _, exists := phoneMap[phoneNumber]; !exists {
-					if !processedUsers[member.PhoneNumber] {
-						msg += "⛔ " + member.Name + " (" + member.PhoneNumber + ") : -3\n"
-						KurangPoinUserbyPhoneNumber(db, member.PhoneNumber, 3)
-						processedUsers[member.PhoneNumber] = true
+					if !processedUsers[member.ID] {
+						msg += "⛔ " + member.Name + " (" + member.ID + ") : -3\n"
+						KurangPoinUserbyPhoneNumber(db, member.ID, 3)
+						processedUsers[member.ID] = true
 					}
 				}
 			}

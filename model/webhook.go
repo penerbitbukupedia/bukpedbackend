@@ -29,29 +29,37 @@ type Laporan struct {
 }
 
 type PushReport struct {
-	ProjectName string        `bson:"projectname" json:"projectname"`
-	Project     Project       `bson:"project" json:"project"`
-	User        Userdomyikado `bson:"user,omitempty" json:"user,omitempty"`
-	Username    string        `bson:"username" json:"username"`
-	Email       string        `bson:"email,omitempty" json:"email,omitempty"`
-	Repo        string        `bson:"repo" json:"repo"`
-	Ref         string        `bson:"ref" json:"ref"`
-	Message     string        `bson:"message" json:"message"`
-	Modified    string        `bson:"modified,omitempty" json:"modified,omitempty"`
-	RemoteAddr  string        `bson:"remoteaddr,omitempty" json:"remoteaddr,omitempty"`
+	ProjectName string   `bson:"projectname" json:"projectname"`
+	Project     Project  `bson:"project" json:"project"`
+	User        MenuItem `bson:"menu,omitempty" json:"menu,omitempty"`
+	Username    string   `bson:"username" json:"username"`
+	Email       string   `bson:"email,omitempty" json:"email,omitempty"`
+	Repo        string   `bson:"repo" json:"repo"`
+	Ref         string   `bson:"ref" json:"ref"`
+	Message     string   `bson:"message" json:"message"`
+	Modified    string   `bson:"modified,omitempty" json:"modified,omitempty"`
+	RemoteAddr  string   `bson:"remoteaddr,omitempty" json:"remoteaddr,omitempty"`
 }
 
 type Project struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	Secret      string             `bson:"secret" json:"secret"`
 	Name        string             `bson:"name" json:"name"`
+	Title       string             `bson:"title" json:"title"`
 	Description string             `bson:"description" json:"description"`
 	Owner       Userdomyikado      `bson:"owner" json:"owner"`
 	WAGroupID   string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
 	RepoOrg     string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
 	RepoLogName string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
-	Members     []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
+	Menu        []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
 	Closed      bool               `bson:"closed,omitempty" json:"closed,omitempty"`
+}
+
+type MenuItem struct {
+	ID    string `json:"id" bson:"id"`
+	Name  string `json:"name" bson:"name"`
+	Price int    `json:"price" bson:"price"`
+	Image string `json:"image" bson:"image"`
 }
 
 type Userdomyikado struct {

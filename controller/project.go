@@ -154,7 +154,7 @@ func PutDataProject(respw http.ResponseWriter, req *http.Request) {
 	prj.Name = existingprj.Name
 	prj.Secret = existingprj.Secret
 	prj.Owner = existingprj.Owner
-	prj.Members = existingprj.Members
+	prj.Menu = existingprj.Menu
 	prj.WAGroupID = existingprj.WAGroupID
 
 	// Save the updated project back to the database using ReplaceOneDoc
