@@ -318,7 +318,7 @@ func PostDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 	at.WriteJSON(respw, http.StatusOK, existingprj)
 }
 
-func DeleteDataMemberProject(respw http.ResponseWriter, req *http.Request) {
+func DeleteDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 	var respn model.Response
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
 	if err != nil {
@@ -332,7 +332,7 @@ func DeleteDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 
 	var requestPayload struct {
 		ProjectName string `json:"project_name"`
-		PhoneNumber string `json:"phone_number"`
+		MenuIDDb    string `json:"menu_id"`
 	}
 
 	err = json.NewDecoder(req.Body).Decode(&requestPayload)
@@ -360,16 +360,17 @@ func DeleteDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 	}
 
 	// Menghapus member dari project
-	memberToDelete := model.Userdomyikado{PhoneNumber: requestPayload.PhoneNumber}
-	rest, err := atdb.DeleteDocFromArray[model.Userdomyikado](config.Mongoconn, "project", existingprj.ID, "members", memberToDelete)
+	objectId, _ := primitive.ObjectIDFromHex(requestPayload.MenuIDDb)
+	menuToDelete := model.MenuItem{IDDatabase: objectId}
+	rest, err := atdb.DeleteDocFromArray[model.MenuItem](config.Mongoconn, "project", existingprj.ID, "menu", menuToDelete)
 	if err != nil {
-		respn.Status = "Error : Gagal menghapus member dari project"
+		respn.Status = "Error : Gagal menghapus menu dari lapak"
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusExpectationFailed, respn)
 		return
 	}
 	if rest.ModifiedCount == 0 {
-		respn.Status = "Error : Gagal menghapus member dari project"
+		respn.Status = "Error : Gagal menghapus menu dari lapak"
 		respn.Response = "Tidak ada perubahan pada dokumen proyek"
 		at.WriteJSON(respw, http.StatusExpectationFailed, respn)
 		return
