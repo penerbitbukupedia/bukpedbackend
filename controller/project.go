@@ -293,7 +293,7 @@ func PostDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusNotImplemented, respn)
 		return
 	}
-	existingprj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"_id": idprjuser.ID, "owner._id": docuserowner.ID})
+	existingprj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"_id": idprjuser.IDDatabase, "owner._id": docuserowner.ID})
 	if err != nil {
 		respn.Status = "Error : Data project tidak di temukan"
 		respn.Response = err.Error()
