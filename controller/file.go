@@ -81,7 +81,7 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with success message
 	respn.Info = hashedFileName
-	respn.Location = *content.Content.Path
+	respn.Location = "/" + githubRepo + "/" + *content.Content.Path
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
