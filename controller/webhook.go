@@ -6,7 +6,7 @@ import (
 	"github.com/gocroot/model"
 )
 
-func getMemberByAttributeInProject(project model.Project, attribute string, value string) (*model.MenuItem, error) {
+func GetMemberByAttributeInProject(project model.Project, attribute string, value string) (*model.MenuItem, error) {
 	for _, member := range project.Menu {
 		switch attribute {
 		case "email":
