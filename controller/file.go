@@ -15,9 +15,9 @@ import (
 )
 
 func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
+	var respn model.Response
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : Token Tidak Valid"
 		respn.Info = at.GetSecretFromHeader(r)
 		respn.Location = "Decode Token Error"
@@ -27,7 +27,6 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : Data user tidak di temukan"
 		respn.Response = err.Error()
 		at.WriteJSON(w, http.StatusNotImplemented, respn)
@@ -37,7 +36,6 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	objectId, _ := primitive.ObjectIDFromHex(lapakid)
 	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"_id": objectId})
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : Data lapak tidak di temukan"
 		respn.Response = err.Error()
 		at.WriteJSON(w, http.StatusNotImplemented, respn)
@@ -46,14 +44,18 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	file, header, err := r.FormFile("menufile")
 	if err != nil {
-		http.Error(w, "Unable to retrieve the file", http.StatusBadRequest)
+		respn.Status = "Error : File tidak ada"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
 		return
 	}
 	defer file.Close()
 	// Read the file content
 	fileContent, err := io.ReadAll(file)
 	if err != nil {
-		http.Error(w, "Unable to read the file", http.StatusInternalServerError)
+		respn.Status = "Error : File tidak bisa dibaca"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusInternalServerError, respn)
 		return
 	}
 	// Calculate hash of the file content
@@ -71,12 +73,16 @@ func MenuUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	// Use GithubUpload function to upload the file to GitHub
 	content, _, err := ghupload.GithubUpload(GitHubAccessToken, GitHubAuthorName, GitHubAuthorEmail, fileContent, githubOrg, githubRepo, pathFile, replace)
 	if err != nil {
-		http.Error(w, "Failed to upload file to GitHub: "+err.Error(), http.StatusInternalServerError)
+		respn.Status = "Error : File tidak bisa diupload ke github"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusInternalServerError, respn)
 		return
 	}
 
 	// Respond with success message
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "File uploaded successfully to GitHub", "url": "` + content.GetHTMLURL() + `"}`))
+	respn.Info = hashedFileName
+	respn.Location = *content.Content.Path
+	respn.Response = *content.Content.URL
+	respn.Status = *content.Content.HTMLURL
+	at.WriteJSON(w, http.StatusOK, respn)
 }
