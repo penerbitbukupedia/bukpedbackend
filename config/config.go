@@ -29,3 +29,5 @@ func SetEnv() {
 	PublicKeyWhatsAuth = Profile.PublicKey
 	WAAPIToken = Profile.Token
 }
+
+var GHAccessToken string = os.Getenv("GH_ACCESS_TOKEN")
