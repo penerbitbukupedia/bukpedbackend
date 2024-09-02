@@ -332,7 +332,7 @@ func DeleteDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 
 	var requestPayload struct {
 		ProjectName string `json:"project_name"`
-		MenuIDDb    string `json:"menu_id"`
+		MenuID      string `json:"menu_id"`
 	}
 
 	err = json.NewDecoder(req.Body).Decode(&requestPayload)
@@ -360,8 +360,7 @@ func DeleteDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 	}
 
 	// Menghapus member dari project
-	objectId, _ := primitive.ObjectIDFromHex(requestPayload.MenuIDDb)
-	menuToDelete := model.MenuItem{IDDatabase: objectId}
+	menuToDelete := model.MenuItem{ID: requestPayload.MenuID}
 	rest, err := atdb.DeleteDocFromArray[model.MenuItem](config.Mongoconn, "project", existingprj.ID, "menu", menuToDelete)
 	if err != nil {
 		respn.Status = "Error : Gagal menghapus menu dari lapak"
@@ -371,7 +370,7 @@ func DeleteDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 	}
 	if rest.ModifiedCount == 0 {
 		respn.Status = "Error : Gagal menghapus menu dari lapak"
-		respn.Response = "Tidak ada perubahan pada dokumen proyek"
+		respn.Response = "Tidak ada perubahan pada dokumen proyek:" + menuToDelete.ID
 		at.WriteJSON(respw, http.StatusExpectationFailed, respn)
 		return
 	}
