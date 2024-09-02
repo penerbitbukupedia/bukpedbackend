@@ -301,7 +301,7 @@ func PostDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	//bikin insert menu
-	idprjuser.IDDatabase = primitive.NilObjectID
+	//idprjuser.IDDatabase = primitive.NilObjectID
 	rest, err := atdb.AddDocToArray[model.MenuItem](config.Mongoconn, "project", idprjuser.IDDatabase, "menu", idprjuser)
 	if err != nil {
 		respn.Status = "Error : Gagal menambahkan menu ke lapak"
