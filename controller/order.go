@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gocroot/config"
+	"github.com/gocroot/helper/at"
 	"github.com/gocroot/helper/atapi"
 	"github.com/gocroot/helper/atdb"
 	"github.com/gocroot/helper/jualin"
@@ -15,6 +16,7 @@ import (
 
 // Fungsi untuk menangani request order
 func HandleOrder(w http.ResponseWriter, r *http.Request) {
+	namalapak := at.GetParam(r)
 	var orderRequest jualin.PaymentRequest
 
 	// Decode JSON request ke struct
@@ -30,7 +32,7 @@ func HandleOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//kirim pesan ke tenant
-	message := "*Pesanan Masuk*\n" + orderRequest.User.Name + "\n" + orderRequest.User.Whatsapp + "\n" + orderRequest.User.Address + "\n" + createOrderMessage(orderRequest.Orders)
+	message := "*Pesanan Masuk " + namalapak + "*\n" + orderRequest.User.Name + "\n" + orderRequest.User.Whatsapp + "\n" + orderRequest.User.Address + "\n" + createOrderMessage(orderRequest.Orders)
 	newmsg := model.SendText{
 		To:       "628111269691",
 		IsGroup:  false,
