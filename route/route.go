@@ -87,6 +87,9 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	//simpan feedback tiket user
 	case method == "POST" && path == "/data/tiket/rate":
 		controller.PostMasukanTiket(w, r)
+		// order
+	case method == "POST" && at.URLParam(path, "/data/order/:namalapak"):
+		controller.HandleOrder(w, r)
 
 		//disabel pendaftaran
 		//case method == "POST" && path == "/data/user":
