@@ -70,12 +70,12 @@ func FileUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//update data profpic
-	userdoc.ProfilePicture = "https://raw.githubusercontent.com/" + githubOrg + "/" + githubRepo + "/" + *content.Content.Path
+	userdoc.ProfilePicture = "https://raw.githubusercontent.com/" + githubOrg + "/" + githubRepo + "/main/" + *content.Content.Path
 	atdb.ReplaceOneDoc(config.Mongoconn, "user", bson.M{"_id": userdoc.ID}, userdoc)
 
 	// Respond with success message
 	respn.Info = hashedFileName
-	respn.Location = "/" + githubRepo + "/" + *content.Content.Path
+	respn.Location = userdoc.ProfilePicture
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
