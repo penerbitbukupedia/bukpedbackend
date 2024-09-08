@@ -17,6 +17,7 @@ import (
 	"github.com/gocroot/helper/at"
 	"github.com/gocroot/helper/atapi"
 	"github.com/gocroot/helper/atdb"
+	"github.com/gocroot/helper/gcallapi"
 	"github.com/gocroot/helper/lms"
 	"github.com/gocroot/helper/report"
 	"github.com/gocroot/helper/watoken"
@@ -225,7 +226,20 @@ func PostDataBioUser(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusOK, usr)
 		return
 	}
+
+	//publish ke blog
+	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, "2587271685863777988", docuser.Name, usr.Bio)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Gagal post ke blogger"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusConflict, respn)
+		return
+	}
+	//update data content
+	docuser.URLBio = bpost.Id
 	docuser.Bio = usr.Bio
+	//update user data
 	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id}, docuser)
 	if err != nil {
 		var respn model.Response
