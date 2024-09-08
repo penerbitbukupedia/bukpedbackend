@@ -96,6 +96,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	//user pendaftaran
 	case method == "POST" && path == "/data/user":
 		controller.PostDataUser(w, r)
+	case method == "POST" && path == "/data/user/bio":
+		controller.PostDataBioUser(w, r)
 	case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
 		controller.PostDataUserFromWA(w, r)
 	//data proyek

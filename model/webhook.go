@@ -78,6 +78,7 @@ type Userdomyikado struct {
 	GoogleProfilePicture string             `bson:"googleprofilepicture,omitempty" json:"picture,omitempty"`
 	ProfilePicture       string             `bson:"profpic,omitempty" json:"profpic,omitempty"`
 	Bio                  string             `bson:"bio,omitempty" json:"bio,omitempty"`
+	URLBio               string             `bson:"urlbio,omitempty" json:"urlbio,omitempty"`
 	Team                 string             `json:"team,omitempty" bson:"team,omitempty"`
 	Scope                string             `json:"scope,omitempty" bson:"scope,omitempty"`
 	Section              string             `json:"section,omitempty" bson:"section,omitempty"`
