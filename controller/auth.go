@@ -21,6 +21,16 @@ import (
 )
 
 func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
+	logintoken, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Token Tidak Valid "
+		respn.Info = at.GetSecretFromHeader(r)
+		respn.Location = "Decode Token Error: " + at.GetLoginFromHeader(r)
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusForbidden, respn)
+		return
+	}
 	var request struct {
 		Token string `json:"token"`
 	}
@@ -51,6 +61,7 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 
 	userInfo := model.Userdomyikado{
 		Name:                 payload.Claims["name"].(string),
+		PhoneNumber:          logintoken.Id,
 		Email:                payload.Claims["email"].(string),
 		GoogleProfilePicture: payload.Claims["picture"].(string),
 	}
@@ -65,14 +76,21 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 	var existingUser model.Userdomyikado
 	err = collection.FindOne(ctx, filter).Decode(&existingUser)
 	if err != nil || existingUser.PhoneNumber == "" {
-		// User does not exist or exists but has no phone number, request QR scan
+		// User does not exist or exists but has no phone number, insert into db
+		id, err := atdb.InsertOneDoc(config.Mongoconn, "user", userInfo)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadGateway)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Database Connection Problem: Unable to fetch credentials"})
+			return
+		}
 		response := map[string]interface{}{
-			"message": "Please scan the QR code to provide your phone number",
+			"message": "User Berhasil Terdaftar",
 			"user":    userInfo,
-			"token":   "",
+			"id":      id.Hex(),
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(response)
 		return
 	} else if existingUser.PhoneNumber != "" {

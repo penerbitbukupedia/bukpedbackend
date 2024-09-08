@@ -130,7 +130,9 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.RefreshLMSCookie(w, r)
 	case method == "GET" && path == "/lms/count/user":
 		controller.GetCountDocUser(w, r)
-	// Google Auth
+		// Google Auth
+	case method == "POST" && path == "/auth/register/users":
+		controller.RegisterGmailAuth(w, r)
 	case method == "POST" && path == "/auth/users":
 		controller.Auth(w, r)
 	case method == "POST" && path == "/auth/login":
