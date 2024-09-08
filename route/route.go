@@ -19,7 +19,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	case method == "GET" && path == "/":
 		controller.GetHome(w, r)
 	//upload gambar profile
-	case method == "POST" && at.URLParam(path, "/upload/file/:projectid"):
+	case method == "POST" && path == "/upload/profpic":
 		controller.FileUploadFileHandler(w, r)
 	//upload gambar project
 	case method == "POST" && at.URLParam(path, "/upload/file/:projectid"):
