@@ -142,11 +142,9 @@ func PostDataUser(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusOK, usr)
 		return
 	}
-	docuser.Name = payload.Alias
-	docuser.Email = usr.Email
-	docuser.GitHostUsername = usr.GitHostUsername
-	docuser.GitlabUsername = usr.GitlabUsername
-	docuser.GithubUsername = usr.GithubUsername
+	docuser.NIK = usr.NIK
+	docuser.Pekerjaan = usr.Pekerjaan
+	docuser.Alamat = usr.Alamat
 	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id}, docuser)
 	if err != nil {
 		var respn model.Response
