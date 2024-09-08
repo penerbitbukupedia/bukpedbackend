@@ -68,6 +68,9 @@ type Userdomyikado struct {
 	Name                 string             `bson:"name,omitempty" json:"name,omitempty"`
 	PhoneNumber          string             `bson:"phonenumber,omitempty" json:"phonenumber,omitempty"`
 	Email                string             `bson:"email,omitempty" json:"email,omitempty"`
+	NIK                  string             `bson:"nik,omitempty" json:"nik,omitempty"`
+	Pekerjaan            string             `bson:"pekerjaan,omitempty" json:"pekerjaan,omitempty"`
+	Alamat               string             `bson:"alamat,omitempty" json:"alamat,omitempty"`
 	GithubUsername       string             `bson:"githubusername,omitempty" json:"githubusername,omitempty"`
 	GitlabUsername       string             `bson:"gitlabusername,omitempty" json:"gitlabusername,omitempty"`
 	GitHostUsername      string             `bson:"githostusername,omitempty" json:"githostusername,omitempty"`

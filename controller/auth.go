@@ -20,6 +20,100 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		Token string `json:"token"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid request"})
+		return
+	}
+
+	// Ambil kredensial dari database
+	creds, err := atdb.GetOneDoc[auth.GoogleCredential](config.Mongoconn, "credentials", bson.M{})
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Database Connection Problem: Unable to fetch credentials"})
+		return
+	}
+
+	// Verifikasi ID token menggunakan client_id
+	payload, err := auth.VerifyIDToken(request.Token, creds.ClientID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token: Token verification failed"})
+		return
+	}
+
+	userInfo := model.Userdomyikado{
+		Name:                 payload.Claims["name"].(string),
+		Email:                payload.Claims["email"].(string),
+		GoogleProfilePicture: payload.Claims["picture"].(string),
+	}
+
+	// Simpan atau perbarui informasi pengguna di database
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	collection := config.Mongoconn.Collection("user")
+	filter := bson.M{"email": userInfo.Email}
+
+	var existingUser model.Userdomyikado
+	err = collection.FindOne(ctx, filter).Decode(&existingUser)
+	if err != nil || existingUser.PhoneNumber == "" {
+		// User does not exist or exists but has no phone number, request QR scan
+		response := map[string]interface{}{
+			"message": "Please scan the QR code to provide your phone number",
+			"user":    userInfo,
+			"token":   "",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(response)
+		return
+	} else if existingUser.PhoneNumber != "" {
+		token, err := watoken.EncodeforHours(existingUser.PhoneNumber, existingUser.Name, config.PrivateKey, 18) // Generating a token for 18 hours
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Token generation failed"})
+			return
+		}
+		response := map[string]interface{}{
+			"message": "Authenticated successfully",
+			"user":    userInfo,
+			"token":   token,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	update := bson.M{
+		"$set": userInfo,
+	}
+	opts := options.Update().SetUpsert(true)
+	_, err = collection.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Failed to save user info: Database update failed"})
+		return
+	}
+
+	response := map[string]interface{}{
+		"user": userInfo,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
 func Auth(w http.ResponseWriter, r *http.Request) {
 	var request struct {
 		Token string `json:"token"`
@@ -266,7 +360,7 @@ func VerifyPasswordHandler(respw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    // Implementasi rate limiting
+	// Implementasi rate limiting
 	limiter := rl.GetLimiter(request.PhoneNumber)
 	if !limiter.Allow() {
 		var respn model.Response

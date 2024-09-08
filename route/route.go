@@ -43,9 +43,6 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		//get random 4 testi
 	case method == "GET" && path == "/data/lms/random/testi":
 		controller.GetRandomTesti4(w, r)
-	//user data
-	case method == "GET" && path == "/data/user":
-		controller.GetDataUser(w, r)
 	//mendapatkan data sent item
 	case method == "GET" && at.URLParam(path, "/data/peserta/sent/:id"):
 		controller.GetSentItem(w, r)
@@ -90,12 +87,15 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		// order
 	case method == "POST" && at.URLParam(path, "/data/order/:namalapak"):
 		controller.HandleOrder(w, r)
-
-		//disabel pendaftaran
-		//case method == "POST" && path == "/data/user":
-		//	controller.PostDataUser(w, r)
-		//case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
-		//	controller.PostDataUserFromWA(w, r)
+	//user data
+	case method == "GET" && path == "/data/user":
+		controller.GetDataUser(w, r)
+	//user pendaftaran
+	case method == "POST" && path == "/data/user":
+		controller.PostDataUser(w, r)
+	case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
+		controller.PostDataUserFromWA(w, r)
+	//data proyek
 	case method == "GET" && path == "/data/proyek":
 		controller.GetDataProject(w, r)
 	case method == "POST" && path == "/data/proyek":
