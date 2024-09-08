@@ -11,6 +11,7 @@ import (
 	"github.com/gocroot/helper/ghupload"
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -68,6 +69,9 @@ func FileUploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		at.WriteJSON(w, http.StatusInternalServerError, respn)
 		return
 	}
+	//update data profpic
+	userdoc.ProfilePicture = "https://raw.githubusercontent.com/" + githubOrg + "/" + githubRepo + "/" + *content.Content.Path
+	atdb.ReplaceOneDoc(config.Mongoconn, "user", bson.M{"_id": userdoc.ID}, userdoc)
 
 	// Respond with success message
 	respn.Info = hashedFileName
