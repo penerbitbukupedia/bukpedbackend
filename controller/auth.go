@@ -96,8 +96,8 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 	} else if existingUser.PhoneNumber != "" {
 		response := map[string]interface{}{
 			"message": "Authenticated successfully",
-			"user":    userInfo,
-			"id":      userInfo.ID,
+			"user":    existingUser,
+			"id":      existingUser.ID,
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
