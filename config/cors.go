@@ -6,9 +6,9 @@ import (
 
 // Daftar origins yang diizinkan
 var Origins = []string{
-	"https://kb.pd.my.id",
-	"https://pd.my.id",
-	"https://jual.in.my.id",
+	"https://www.bukupedia.co.id",
+	"https://naskah.bukupedia.co.id",
+	"https://bukupedia.co.id",
 }
 
 // Fungsi untuk memeriksa apakah origin diizinkan
