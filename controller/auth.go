@@ -71,7 +71,7 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	collection := config.Mongoconn.Collection("user")
-	filter := bson.M{"email": userInfo.Email}
+	filter := bson.M{"phonenumber": logintoken.Id}
 
 	var existingUser model.Userdomyikado
 	err = collection.FindOne(ctx, filter).Decode(&existingUser)
