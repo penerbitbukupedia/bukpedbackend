@@ -94,17 +94,10 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	} else if existingUser.PhoneNumber != "" {
-		token, err := watoken.EncodeforHours(existingUser.PhoneNumber, existingUser.Name, config.PrivateKey, 18) // Generating a token for 18 hours
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{"message": "Token generation failed"})
-			return
-		}
 		response := map[string]interface{}{
 			"message": "Authenticated successfully",
 			"user":    userInfo,
-			"token":   token,
+			"id":      userInfo.ID,
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
