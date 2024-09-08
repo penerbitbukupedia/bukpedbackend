@@ -77,6 +77,7 @@ type Userdomyikado struct {
 	Poin                 float64            `bson:"poin,omitempty" json:"poin,omitempty"`
 	GoogleProfilePicture string             `bson:"googleprofilepicture,omitempty" json:"picture,omitempty"`
 	ProfilePicture       string             `bson:"profpic,omitempty" json:"profpic,omitempty"`
+	Bio                  string             `bson:"bio,omitempty" json:"bio,omitempty"`
 	Team                 string             `json:"team,omitempty" bson:"team,omitempty"`
 	Scope                string             `json:"scope,omitempty" bson:"scope,omitempty"`
 	Section              string             `json:"section,omitempty" bson:"section,omitempty"`
