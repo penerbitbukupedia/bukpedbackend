@@ -12,7 +12,7 @@ import (
 )
 
 // Helper function to create a Blogger service
-func createBloggerService(ctx context.Context, db *mongo.Database) (*blogger.Service, error) {
+func createBloggerService(db *mongo.Database) (*blogger.Service, error) {
 	// Retrieve OAuth2 config from DB
 	config, err := credentialsFromDB(db)
 	if err != nil {
@@ -37,8 +37,8 @@ func createBloggerService(ctx context.Context, db *mongo.Database) (*blogger.Ser
 		}
 	}
 
-	client := config.Client(ctx, token)
-	srv, err := blogger.NewService(ctx, option.WithHTTPClient(client))
+	client := config.Client(context.TODO(), token)
+	srv, err := blogger.NewService(context.TODO(), option.WithHTTPClient(client))
 	if err != nil {
 		return nil, err
 	}
@@ -48,9 +48,7 @@ func createBloggerService(ctx context.Context, db *mongo.Database) (*blogger.Ser
 
 // Function to post to Blogger
 func PostToBlogger(db *mongo.Database, blogID, title, content string) (*blogger.Post, error) {
-	ctx := context.Background()
-
-	srv, err := createBloggerService(ctx, db)
+	srv, err := createBloggerService(db)
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +68,7 @@ func PostToBlogger(db *mongo.Database, blogID, title, content string) (*blogger.
 
 // Function to check if a post with the same title already exists in Blogger
 func PostExistsInBlogger(db *mongo.Database, blogID, title string) (bool, error) {
-	ctx := context.Background()
-
-	srv, err := createBloggerService(ctx, db)
+	srv, err := createBloggerService(db)
 	if err != nil {
 		return false, err
 	}
@@ -94,8 +90,6 @@ func PostExistsInBlogger(db *mongo.Database, blogID, title string) (bool, error)
 
 // Function to create a post in Blogger
 func CreatePostInBlogger(db *mongo.Database, blogID, title, content string) (*blogger.Post, error) {
-	ctx := context.Background()
-
 	exists, err := PostExistsInBlogger(db, blogID, title)
 	if err != nil {
 		return nil, err
@@ -105,7 +99,7 @@ func CreatePostInBlogger(db *mongo.Database, blogID, title, content string) (*bl
 		return nil, errors.New("post with the same title already exists")
 	}
 
-	srv, err := createBloggerService(ctx, db)
+	srv, err := createBloggerService(db)
 	if err != nil {
 		return nil, err
 	}
@@ -125,9 +119,7 @@ func CreatePostInBlogger(db *mongo.Database, blogID, title, content string) (*bl
 
 // Function to delete a post from Blogger
 func DeletePostFromBlogger(db *mongo.Database, blogID, postID string) error {
-	ctx := context.Background()
-
-	srv, err := createBloggerService(ctx, db)
+	srv, err := createBloggerService(db)
 	if err != nil {
 		return err
 	}
