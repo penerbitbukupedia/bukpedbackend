@@ -47,7 +47,7 @@ func createBloggerService(db *mongo.Database) (*blogger.Service, error) {
 }
 
 // Function to post to Blogger
-func PostToBlogger(db *mongo.Database, blogID, title, content string) (*blogger.Post, error) {
+func PostToBlogger(db *mongo.Database, postID, blogID, title, content string) (*blogger.Post, error) {
 	srv, err := createBloggerService(db)
 	if err != nil {
 		return nil, err
@@ -57,10 +57,19 @@ func PostToBlogger(db *mongo.Database, blogID, title, content string) (*blogger.
 		Title:   title,
 		Content: content,
 	}
+	var createdPost *blogger.Post
 
-	createdPost, err := srv.Posts.Insert(blogID, post).Do()
-	if err != nil {
-		return nil, err
+	if postID != "" {
+		post.Id = postID
+		createdPost, err = srv.Posts.Update(blogID, postID, post).Do()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		createdPost, err = srv.Posts.Insert(blogID, post).Do()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return createdPost, nil

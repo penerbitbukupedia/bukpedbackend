@@ -228,7 +228,7 @@ func PostDataBioUser(respw http.ResponseWriter, req *http.Request) {
 	}
 
 	//publish ke blog
-	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, "2587271685863777988", docuser.Name, usr.Bio)
+	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, docuser.URLBio, "2587271685863777988", docuser.Name, usr.Bio)
 	if err != nil {
 		var respn model.Response
 		respn.Status = "Gagal post ke blogger"
