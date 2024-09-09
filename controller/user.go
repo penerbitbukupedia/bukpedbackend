@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gocroot/config"
@@ -228,7 +229,9 @@ func PostDataBioUser(respw http.ResponseWriter, req *http.Request) {
 	}
 
 	//publish ke blog
-	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, docuser.URLBio, "2587271685863777988", docuser.Name, usr.Bio)
+	postingan := strings.ReplaceAll(config.ProfPost, "##PROFPIC##", usr.ProfilePicture)
+	postingan = strings.ReplaceAll(postingan, "##BIO##", usr.Bio)
+	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, docuser.URLBio, "2587271685863777988", docuser.Name, postingan)
 	if err != nil {
 		var respn model.Response
 		respn.Status = "Gagal post ke blogger"
