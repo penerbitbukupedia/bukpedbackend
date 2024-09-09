@@ -227,6 +227,14 @@ func PostDataBioUser(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusOK, usr)
 		return
 	}
+	//check profpic apakah kosong  atau engga
+	if docuser.ProfilePicture == "" {
+		var respn model.Response
+		respn.Status = "Belum ada Profile Picture"
+		respn.Response = "Mohon upload dahulu profile picture anda pada form yang disediakan"
+		at.WriteJSON(respw, http.StatusConflict, respn)
+		return
+	}
 
 	//publish ke blog
 	postingan := strings.ReplaceAll(config.ProfPost, "##PROFPIC##", docuser.ProfilePicture)
