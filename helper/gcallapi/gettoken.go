@@ -12,10 +12,14 @@ import (
 
 // Retrieve credentials.json from MongoDB
 func credentialsFromDB(db *mongo.Database) (*oauth2.Config, error) {
-	collection := db.Collection("credentials")
+	const credcoll = "credentials"
+	collection := db.Collection(credcoll)
 	var credentialRecord CredentialRecord
-	err := collection.FindOne(context.TODO(), bson.M{}).Decode(&credentialRecord)
+	err := collection.FindOne(context.TODO(), nil).Decode(&credentialRecord)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("tidak ditemukan data cred di collection " + credcoll)
+		}
 		return nil, err
 	}
 
