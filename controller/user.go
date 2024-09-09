@@ -229,7 +229,7 @@ func PostDataBioUser(respw http.ResponseWriter, req *http.Request) {
 	}
 
 	//publish ke blog
-	postingan := strings.ReplaceAll(config.ProfPost, "##PROFPIC##", usr.ProfilePicture)
+	postingan := strings.ReplaceAll(config.ProfPost, "##PROFPIC##", docuser.ProfilePicture)
 	postingan = strings.ReplaceAll(postingan, "##BIO##", usr.Bio)
 	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, docuser.URLBio, "2587271685863777988", docuser.Name, postingan)
 	if err != nil {
