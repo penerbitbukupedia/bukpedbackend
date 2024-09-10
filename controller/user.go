@@ -266,6 +266,7 @@ func PostDataBioUser(respw http.ResponseWriter, req *http.Request) {
 	}
 	//update data content
 	docuser.URLBio = bpost.Id
+	docuser.PATHBio = bpost.Url
 	docuser.Bio = usr.Bio
 	//update user data
 	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id}, docuser)
