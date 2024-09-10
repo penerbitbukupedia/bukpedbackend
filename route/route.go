@@ -18,10 +18,6 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case method == "GET" && path == "/":
 		controller.GetHome(w, r)
-
-	//upload gambar project
-	case method == "POST" && at.URLParam(path, "/upload/file/:projectid"):
-		controller.FileUploadWithParamFileHandler(w, r)
 	//chat bot inbox
 	case method == "POST" && at.URLParam(path, "/webhook/nomor/:nomorwa"):
 		controller.PostInboxNomor(w, r)
@@ -115,6 +111,10 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.GetDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek/anggota":
 		controller.PostDataMemberProject(w, r)
+	//upload cover buku project
+	case method == "POST" && at.URLParam(path, "/upload/coverbuku/:projectid"):
+		controller.UploadCoverBukuWithParamFileHandler(w, r)
+
 	case method == "POST" && path == "/data/proyek/menu":
 		controller.PostDataMenuProject(w, r)
 	case method == "POST" && path == "/approvebimbingan":
