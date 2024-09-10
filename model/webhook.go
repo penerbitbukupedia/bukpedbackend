@@ -42,22 +42,23 @@ type PushReport struct {
 }
 
 type Project struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Secret      string             `bson:"secret,omitempty" json:"secret,omitempty"`
-	Name        string             `bson:"name" json:"name"`
-	Title       string             `bson:"title" json:"title"`
-	Description string             `bson:"description" json:"description"`
-	Owner       Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
-	Editor      Userdomyikado      `bson:"editor,omitempty" json:"editor,omitempty"`
-	WAGroupID   string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
-	RepoOrg     string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
-	RepoLogName string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
-	CoverBuku   string             `bson:"coverbuku,omitempty" json:"coverbuku,omitempty"`
-	URLKatalog  string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
-	PATHKatalog string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
-	Menu        []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
-	Members     []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
-	Closed      bool               `bson:"closed,omitempty" json:"closed,omitempty"`
+	ID             primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Secret         string             `bson:"secret,omitempty" json:"secret,omitempty"`
+	Name           string             `bson:"name" json:"name"`
+	Title          string             `bson:"title" json:"title"`
+	Description    string             `bson:"description" json:"description"`
+	KalimatPromosi string             `bson:"kalimatpromosi" json:"kalimatpromosi"`
+	Owner          Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
+	Editor         Userdomyikado      `bson:"editor,omitempty" json:"editor,omitempty"`
+	WAGroupID      string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
+	RepoOrg        string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
+	RepoLogName    string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
+	CoverBuku      string             `bson:"coverbuku,omitempty" json:"coverbuku,omitempty"`
+	URLKatalog     string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
+	PATHKatalog    string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
+	Menu           []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
+	Members        []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
+	Closed         bool               `bson:"closed,omitempty" json:"closed,omitempty"`
 }
 
 type MenuItem struct {
