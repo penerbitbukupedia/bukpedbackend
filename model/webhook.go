@@ -54,6 +54,9 @@ type Project struct {
 	RepoOrg        string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
 	RepoLogName    string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
 	CoverBuku      string             `bson:"coverbuku,omitempty" json:"coverbuku,omitempty"`
+	DraftBuku      string             `bson:"draftbuku,omitempty" json:"draftbuku,omitempty"`
+	DraftPDFBuku   string             `bson:"draftpdfbuku,omitempty" json:"draftpdfbuku,omitempty"`
+	SampulPDFBuku  string             `bson:"sampulpdfbuku,omitempty" json:"sampulpdfbuku,omitempty"`
 	URLKatalog     string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
 	PATHKatalog    string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
 	Menu           []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
