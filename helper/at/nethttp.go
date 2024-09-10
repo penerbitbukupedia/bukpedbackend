@@ -2,6 +2,7 @@ package at
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -36,6 +37,14 @@ func WriteJSON(respw http.ResponseWriter, statusCode int, content interface{}) {
 	respw.Header().Set("Content-Type", "application/json")
 	respw.WriteHeader(statusCode)
 	respw.Write([]byte(Jsonstr(content)))
+}
+
+func WriteFile(w http.ResponseWriter, statusCode int, fileContent []byte) {
+	w.Header().Set("Content-Disposition", "attachment; filename=\"file.ext\"")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Length", fmt.Sprint(len(fileContent)))
+	w.WriteHeader(statusCode)
+	w.Write(fileContent)
 }
 
 func WriteString(respw http.ResponseWriter, statusCode int, content string) {

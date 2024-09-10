@@ -93,7 +93,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	case method == "POST" && path == "/data/user":
 		controller.PostDataUser(w, r)
 	case method == "POST" && path == "/upload/profpic": //upload gambar profile
-		controller.FileUploadFileHandler(w, r)
+		controller.UploadProfilePictureHandler(w, r)
 	case method == "POST" && path == "/data/user/bio":
 		controller.PostDataBioUser(w, r)
 		/* 	case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
@@ -111,7 +111,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.GetDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek/anggota":
 		controller.PostDataMemberProject(w, r)
-	//upload cover buku project
+	//upload cover,draft,pdf,sampul buku project
 	case method == "POST" && at.URLParam(path, "/upload/coverbuku/:projectid"):
 		controller.UploadCoverBukuWithParamFileHandler(w, r)
 	case method == "POST" && at.URLParam(path, "/upload/draftbuku/:projectid"):
@@ -120,6 +120,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.UploadDraftBukuPDFWithParamFileHandler(w, r)
 	case method == "POST" && at.URLParam(path, "/upload/sampulpdfbuku/:projectid"):
 		controller.UploadSampulBukuPDFWithParamFileHandler(w, r)
+	case method == "GET" && at.URLParam(path, "/download/draft/:path"): //downoad file draft
+		controller.AksesFileRepoDraft(w, r)
 
 	case method == "POST" && path == "/data/proyek/menu":
 		controller.PostDataMenuProject(w, r)
