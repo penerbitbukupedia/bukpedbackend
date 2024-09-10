@@ -3,6 +3,7 @@ package ghupload
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 
 	"github.com/google/go-github/v59/github"
@@ -44,4 +45,38 @@ func GithubUpload(GitHubAccessToken, GitHubAuthorName, GitHubAuthorEmail string,
 	}
 
 	return
+}
+
+// Function to get file content from GitHub repository
+// Set header untuk mendownload file
+// w.Header().Set("Content-Disposition", "attachment; filename=\"file.ext\"")
+// w.Header().Set("Content-Type", "application/octet-stream")
+// w.Header().Set("Content-Length", fmt.Sprint(len(fileContent)))
+// // Tulis konten file ke response writer
+// w.Write(fileContent)
+func GithubGetFile(GitHubAccessToken, githubOrg, githubRepo, pathFile string) (fileContent []byte, err error) {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: GitHubAccessToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	client := github.NewClient(tc)
+
+	// Get file content from the repository
+	fileContentResponse, _, _, err := client.Repositories.GetContents(ctx, githubOrg, githubRepo, pathFile, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decode the base64 encoded file content
+	encodedContent, err := fileContentResponse.GetContent()
+	if err != nil {
+		return nil, err
+	}
+	decodedContent, err := base64.StdEncoding.DecodeString(encodedContent)
+	if err != nil {
+		return nil, err
+	}
+
+	return decodedContent, nil
 }
