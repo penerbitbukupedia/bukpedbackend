@@ -113,6 +113,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.DeleteDataProject(w, r)
 	case method == "GET" && path == "/data/proyek/anggota":
 		controller.GetDataMemberProject(w, r)
+	case method == "POST" && path == "/data/proyek/anggota":
+		controller.PostDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek/menu":
 		controller.PostDataMenuProject(w, r)
 	case method == "POST" && path == "/approvebimbingan":
