@@ -154,7 +154,10 @@ func PutDataProject(respw http.ResponseWriter, req *http.Request) {
 	prj.Secret = existingprj.Secret
 	prj.Owner = existingprj.Owner
 	prj.Members = existingprj.Members
-	prj.WAGroupID = existingprj.WAGroupID
+	prj.CoverBuku = existingprj.CoverBuku
+	prj.DraftBuku = existingprj.DraftBuku
+	prj.DraftPDFBuku = existingprj.DraftPDFBuku
+	prj.SampulPDFBuku = existingprj.SampulPDFBuku
 
 	// Save the updated project back to the database using ReplaceOneDoc
 	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "project", primitive.M{"_id": existingprj.ID}, prj)
