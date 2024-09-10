@@ -152,6 +152,14 @@ func PostDataUser(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusOK, usr)
 		return
 	}
+	//jika email belum gsign maka gsign dulu
+	if docuser.Email == "" {
+		var respn model.Response
+		respn.Status = "Email belum terdaftar"
+		respn.Response = "Mohon lakukan google sign in dahulu agar email bisa terdaftar"
+		at.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
 	docuser.NIK = usr.NIK
 	docuser.Pekerjaan = usr.Pekerjaan
 	docuser.AlamatRumah = usr.AlamatRumah

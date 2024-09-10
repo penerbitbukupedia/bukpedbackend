@@ -18,9 +18,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case method == "GET" && path == "/":
 		controller.GetHome(w, r)
-	//upload gambar profile
-	case method == "POST" && path == "/upload/profpic":
-		controller.FileUploadFileHandler(w, r)
+
 	//upload gambar project
 	case method == "POST" && at.URLParam(path, "/upload/file/:projectid"):
 		controller.FileUploadWithParamFileHandler(w, r)
@@ -94,12 +92,16 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	case method == "GET" && path == "/data/user":
 		controller.GetDataUser(w, r)
 	//user pendaftaran
+	case method == "POST" && path == "/auth/register/users": //mendapatkan email gmail
+		controller.RegisterGmailAuth(w, r)
 	case method == "POST" && path == "/data/user":
 		controller.PostDataUser(w, r)
+	case method == "POST" && path == "/upload/profpic": //upload gambar profile
+		controller.FileUploadFileHandler(w, r)
 	case method == "POST" && path == "/data/user/bio":
 		controller.PostDataBioUser(w, r)
-	case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
-		controller.PostDataUserFromWA(w, r)
+		/* 	case method == "POST" && at.URLParam(path, "/data/user/wa/:nomorwa"):
+		controller.PostDataUserFromWA(w, r) */
 	//data proyek
 	case method == "GET" && path == "/data/proyek":
 		controller.GetDataProject(w, r)
@@ -135,9 +137,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.RefreshLMSCookie(w, r)
 	case method == "GET" && path == "/lms/count/user":
 		controller.GetCountDocUser(w, r)
-		// Google Auth
-	case method == "POST" && path == "/auth/register/users":
-		controller.RegisterGmailAuth(w, r)
+	// Google Auth
 	case method == "POST" && path == "/auth/users":
 		controller.Auth(w, r)
 	case method == "POST" && path == "/auth/login":
