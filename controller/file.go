@@ -314,7 +314,7 @@ func UploadDraftBukuWithParamFileHandler(w http.ResponseWriter, r *http.Request)
 
 	// Respond with success message
 	respn.Info = hashedFileName
-	respn.Location = prj.CoverBuku
+	respn.Location = prj.DraftBuku
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
@@ -397,7 +397,7 @@ func UploadDraftBukuPDFWithParamFileHandler(w http.ResponseWriter, r *http.Reque
 
 	// Respond with success message
 	respn.Info = hashedFileName
-	respn.Location = prj.CoverBuku
+	respn.Location = prj.DraftPDFBuku
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
@@ -480,7 +480,7 @@ func UploadSampulBukuPDFWithParamFileHandler(w http.ResponseWriter, r *http.Requ
 
 	// Respond with success message
 	respn.Info = hashedFileName
-	respn.Location = prj.CoverBuku
+	respn.Location = prj.SampulPDFBuku
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
