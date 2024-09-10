@@ -48,10 +48,15 @@ type Project struct {
 	Title       string             `bson:"title" json:"title"`
 	Description string             `bson:"description" json:"description"`
 	Owner       Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
+	Editor      Userdomyikado      `bson:"editor,omitempty" json:"editor,omitempty"`
 	WAGroupID   string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
 	RepoOrg     string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
 	RepoLogName string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
+	CoverBuku   string             `bson:"coverbuku,omitempty" json:"coverbuku,omitempty"`
+	URLKatalog  string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
+	PATHKatalog string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
 	Menu        []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
+	Members     []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
 	Closed      bool               `bson:"closed,omitempty" json:"closed,omitempty"`
 }
 
@@ -87,6 +92,7 @@ type Userdomyikado struct {
 	Chapter              string             `json:"chapter,omitempty" bson:"chapter,omitempty"`
 	LinkedDevice         string             `json:"linkeddevice,omitempty" bson:"linkeddevice,omitempty"`
 	JumlahAntrian        int                `json:"jumlahantrian,omitempty" bson:"jumlahantrian,omitempty"`
+	IsEditor             bool               `json:"iseditor,omitempty" bson:"iseditor,omitempty"`
 }
 
 type Task struct {
