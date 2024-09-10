@@ -116,6 +116,10 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.UploadCoverBukuWithParamFileHandler(w, r)
 	case method == "POST" && at.URLParam(path, "/upload/draftbuku/:projectid"):
 		controller.UploadDraftBukuWithParamFileHandler(w, r)
+	case method == "POST" && at.URLParam(path, "/upload/draftpdfbuku/:projectid"):
+		controller.UploadDraftBukuPDFWithParamFileHandler(w, r)
+	case method == "POST" && at.URLParam(path, "/upload/sampulpdfbuku/:projectid"):
+		controller.UploadSampulBukuPDFWithParamFileHandler(w, r)
 
 	case method == "POST" && path == "/data/proyek/menu":
 		controller.PostDataMenuProject(w, r)
