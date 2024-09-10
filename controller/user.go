@@ -128,6 +128,14 @@ func PostDataUser(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusBadRequest, respn)
 		return
 	}
+	//pengecekan isian usr
+	if usr.NIK == "" || usr.Pekerjaan == "" || usr.AlamatRumah == "" || usr.AlamatKantor == "" {
+		var respn model.Response
+		respn.Status = "Isian tidak lengkap"
+		respn.Response = "Mohon isi lengkap NIK, Pekerjaan, dan kedua alamat"
+		at.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
 	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
 	if err != nil {
 		usr.PhoneNumber = payload.Id
@@ -146,7 +154,8 @@ func PostDataUser(respw http.ResponseWriter, req *http.Request) {
 	}
 	docuser.NIK = usr.NIK
 	docuser.Pekerjaan = usr.Pekerjaan
-	docuser.Alamat = usr.Alamat
+	docuser.AlamatRumah = usr.AlamatRumah
+	docuser.AlamatKantor = usr.AlamatKantor
 	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id}, docuser)
 	if err != nil {
 		var respn model.Response
