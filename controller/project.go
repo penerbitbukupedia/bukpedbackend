@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gocroot/config"
 	"github.com/gocroot/model"
@@ -10,9 +11,106 @@ import (
 
 	"github.com/gocroot/helper/at"
 	"github.com/gocroot/helper/atdb"
+	"github.com/gocroot/helper/gcallapi"
 	"github.com/gocroot/helper/normalize"
 	"github.com/gocroot/helper/watoken"
 )
+
+func PostKatalogBuku(respw http.ResponseWriter, req *http.Request) {
+	var respn model.Response
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
+	if err != nil {
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(req)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+	var prj model.Project
+	err = json.NewDecoder(req.Body).Decode(&prj)
+	if err != nil {
+		respn.Status = "Error : Body tidak valid"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+	//mendapatkan user dari token
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		respn.Status = "Error : User tidak berhak"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+	//cek apakah user memiliki akses ke project
+	project, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"_id": prj.ID})
+	if err != nil {
+		respn.Status = "Error : Data lapak tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+	//check apakah dia owner
+	if project.Owner.PhoneNumber != docuser.PhoneNumber {
+		respn.Status = "Error : User bukan owner project tidak berhak"
+		respn.Response = "User bukan owner dari project ini"
+		at.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+
+	//check cover buku apakah kosong  atau engga
+	if project.CoverBuku == "" {
+		var respn model.Response
+		respn.Status = "Belum ada Cover Buku"
+		respn.Response = "Mohon upload dahulu cover buku anda pada form yang disediakan"
+		at.WriteJSON(respw, http.StatusConflict, respn)
+		return
+	}
+
+	//publish ke blog katalog
+	postingan := strings.ReplaceAll(config.KatalogPost, "##URLCOVERBUKU##", project.CoverBuku)
+	postingan = strings.ReplaceAll(postingan, "##SINOPSISBUKU##", project.Description)
+	postingan = strings.ReplaceAll(postingan, "##HURUFPERTAMASINOPSIS##", string(project.Description[0]))
+	postingan = strings.ReplaceAll(postingan, "##KALIMATPROMOSIBUKU##", project.KalimatPromosi)
+	postingan = strings.ReplaceAll(postingan, "##EDITOR##", project.Editor.Name)
+	postingan = strings.ReplaceAll(postingan, "##ISBN##", project.ISBN)
+	postingan = strings.ReplaceAll(postingan, "##TERBIT##", project.Terbit)
+	postingan = strings.ReplaceAll(postingan, "##UKURAN##", project.Ukuran)
+	postingan = strings.ReplaceAll(postingan, "##JUMLAHHALAMAN##", project.JumlahHalaman)
+	postingan = strings.ReplaceAll(postingan, "##TEBAL##", project.Tebal)
+	var daftarpenulisdengantagli string
+	for _, penulis := range project.Members {
+		daftarpenulisdengantagli += "<li>" + penulis.Name + "</li>"
+	}
+	postingan = strings.ReplaceAll(postingan, "##DAFTARPENULISDENGANTAGLI##", daftarpenulisdengantagli)
+	postingan = strings.ReplaceAll(postingan, "##LINKGRAMED##", project.LinkGramed)
+	postingan = strings.ReplaceAll(postingan, "##LINKPLAYBOOK##", project.LinkPlayBook)
+	postingan = strings.ReplaceAll(postingan, "##LINKKUBUKU##", project.LinkKubuku)
+	postingan = strings.ReplaceAll(postingan, "##LINKMYEDISI##", project.LinkMyedisi)
+
+	bpost, err := gcallapi.PostToBlogger(config.Mongoconn, project.URLKatalog, "3471446342567707906", project.Title, postingan)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Gagal post ke blogger"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusConflict, respn)
+		return
+	}
+	//update data content
+	project.URLKatalog = bpost.Id
+	project.PATHKatalog = bpost.Url
+	//update project data
+	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "project", primitive.M{"_id": project.ID}, project)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Gagal replaceonedoc"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusConflict, respn)
+		return
+	}
+	at.WriteJSON(respw, http.StatusOK, docuser)
+}
 
 func PostDataProject(respw http.ResponseWriter, req *http.Request) {
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))

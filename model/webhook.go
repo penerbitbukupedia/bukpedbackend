@@ -59,6 +59,15 @@ type Project struct {
 	SampulPDFBuku  string             `bson:"sampulpdfbuku,omitempty" json:"sampulpdfbuku,omitempty"`
 	URLKatalog     string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
 	PATHKatalog    string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
+	ISBN           string             `bson:"isbn,omitempty" json:"isbn,omitempty"`
+	Terbit         string             `bson:"terbit,omitempty" json:"terbit,omitempty"`
+	Ukuran         string             `bson:"ukuran,omitempty" json:"ukuran,omitempty"`
+	JumlahHalaman  string             `bson:"jumlahhalaman,omitempty" json:"jumlahhalaman,omitempty"`
+	Tebal          string             `bson:"tebal,omitempty" json:"tebal,omitempty"`
+	LinkGramed     string             `bson:"linkgramed,omitempty" json:"linkgramed,omitempty"`
+	LinkPlayBook   string             `bson:"linkplaybook,omitempty" json:"linkplaybook,omitempty"`
+	LinkKubuku     string             `bson:"linkkubuku,omitempty" json:"linkkubuku,omitempty"`
+	LinkMyedisi    string             `bson:"linkmyedisi,omitempty" json:"linkmyedisi,omitempty"`
 	Menu           []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
 	Members        []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
 	Closed         bool               `bson:"closed,omitempty" json:"closed,omitempty"`
