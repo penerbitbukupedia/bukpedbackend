@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/base64"
 	"io"
 	"net/http"
 	"strings"
@@ -33,7 +34,16 @@ func AksesFileRepoDraft(w http.ResponseWriter, r *http.Request) {
 		at.WriteJSON(w, http.StatusNotImplemented, respn)
 		return
 	}
-	pathFile := at.GetParam(r)
+	pathFileBase64 := at.GetParam(r)
+	// Decode string dari Base64
+	decoded, err := base64.StdEncoding.DecodeString(pathFileBase64)
+	if err != nil {
+		respn.Status = "Error : decoding base64"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	pathFile := string(decoded)
 	pathslice := strings.Split(pathFile, "/")
 	namaprj := pathslice[0]
 	//cek apakah user memiliki akses ke project
