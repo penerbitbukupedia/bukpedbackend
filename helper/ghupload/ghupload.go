@@ -3,9 +3,10 @@ package ghupload
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"io"
 
 	"github.com/google/go-github/v59/github"
 
@@ -64,22 +65,17 @@ func GithubGetFile(GitHubAccessToken, githubOrg, githubRepo, pathFile string) (f
 	client := github.NewClient(tc)
 
 	// Get file content from the repository
-	fileContentResponse, _, _, err := client.Repositories.GetContents(ctx, githubOrg, githubRepo, pathFile, nil)
+	downloadResponse, _, err := client.Repositories.DownloadContents(ctx, githubOrg, githubRepo, pathFile, nil)
 	if err != nil {
 		err = errors.New("error GetContents " + err.Error())
 		return
 	}
+	defer downloadResponse.Close()
 
-	// Decode the base64 encoded file content
-	encodedContent, err := fileContentResponse.GetContent()
+	// Read the binary content
+	fileContent, err = io.ReadAll(downloadResponse)
 	if err != nil {
-		err = errors.New("error fileContentResponse GetContents " + err.Error())
-		return
-	}
-	fileContent, err = base64.StdEncoding.DecodeString(encodedContent)
-	if err != nil {
-		err = errors.New("error base64.StdEncoding.DecodeString " + err.Error())
-		return
+		return nil, fmt.Errorf("error reading binary content: %w", err)
 	}
 
 	return
