@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 
 	"github.com/google/go-github/v59/github"
 
@@ -65,18 +66,21 @@ func GithubGetFile(GitHubAccessToken, githubOrg, githubRepo, pathFile string) (f
 	// Get file content from the repository
 	fileContentResponse, _, _, err := client.Repositories.GetContents(ctx, githubOrg, githubRepo, pathFile, nil)
 	if err != nil {
-		return nil, err
+		err = errors.New("error GetContents " + err.Error())
+		return
 	}
 
 	// Decode the base64 encoded file content
 	encodedContent, err := fileContentResponse.GetContent()
 	if err != nil {
-		return nil, err
+		err = errors.New("error fileContentResponse GetContents " + err.Error())
+		return
 	}
-	decodedContent, err := base64.StdEncoding.DecodeString(encodedContent)
+	fileContent, err = base64.StdEncoding.DecodeString(encodedContent)
 	if err != nil {
-		return nil, err
+		err = errors.New("error base64.StdEncoding.DecodeString " + err.Error())
+		return
 	}
 
-	return decodedContent, nil
+	return
 }
