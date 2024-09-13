@@ -113,6 +113,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.GetDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek/anggota":
 		controller.PostDataMemberProject(w, r)
+	case method == "POST" && path == "/data/proyek/editor":
+		controller.PostDataEditorProject(w, r)
 	//upload cover,draft,pdf,sampul buku project
 	case method == "POST" && at.URLParam(path, "/upload/coverbuku/:projectid"):
 		controller.UploadCoverBukuWithParamFileHandler(w, r)
