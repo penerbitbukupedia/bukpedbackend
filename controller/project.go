@@ -499,7 +499,7 @@ func PostDataEditorProject(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusForbidden, respn)
 		return
 	}
-	var idprjuser model.Userdomyikado
+	var idprjuser model.Project
 	err = json.NewDecoder(req.Body).Decode(&idprjuser)
 	if err != nil {
 		respn.Status = "Error : Body tidak valid"
@@ -521,9 +521,9 @@ func PostDataEditorProject(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusNotFound, respn)
 		return
 	}
-	docusermember, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"_id": idprjuser.ID})
+	docusermember, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"_id": idprjuser.Editor.ID})
 	if err != nil {
-		respn.Status = "Error : Data member tidak di temukan"
+		respn.Status = "Error : Data editor tidak di temukan"
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusConflict, respn)
 		return
