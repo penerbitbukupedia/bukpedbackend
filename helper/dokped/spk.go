@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gocroot/model"
 	"github.com/jung-kurt/gofpdf"
@@ -104,7 +105,7 @@ www.bukupedia.co.id`, "", "L", false)
 
 	// Set a smaller font size for the SPK number and center it
 	pdf.SetFont("Arial", "", 10)
-	pdf.CellFormat(0, 0, "NO. SPK20240722114032", "", 1, "C", false, 0, "")
+	pdf.CellFormat(0, 0, "NO. SPK"+generateNomorSurat(), "", 1, "C", false, 0, "")
 	pdf.Ln(15) // Add space before the content
 
 	// Set font for body content to size 10
@@ -403,4 +404,14 @@ func decryptAES(ciphertext, key []byte) ([]byte, error) {
 	}
 
 	return plaintext, nil
+}
+
+// Function to generate the code in the format YYYYMMDDHHMMSS
+func generateNomorSurat() string {
+	// Get the current date and time
+	now := time.Now()
+
+	// Format the code as YYYYMMDDHHMMSS
+	code := now.Format("20060102150405") // Format: YearMonthDayHourMinuteSecond
+	return code
 }
