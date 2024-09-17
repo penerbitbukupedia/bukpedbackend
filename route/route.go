@@ -103,14 +103,20 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.GetDataProject(w, r)
 	case method == "POST" && path == "/data/proyek":
 		controller.PostDataProject(w, r)
+	case method == "PUT" && path == "/data/metadatabuku":
+		controller.PutMetaDataProject(w, r)
 	case method == "PUT" && path == "/data/proyek":
 		controller.PutDataProject(w, r)
 	case method == "DELETE" && path == "/data/proyek":
 		controller.DeleteDataProject(w, r)
 	case method == "GET" && path == "/data/proyek/anggota":
 		controller.GetDataMemberProject(w, r)
+	case method == "DELETE" && path == "/data/proyek/anggota":
+		controller.DeleteDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek/anggota":
 		controller.PostDataMemberProject(w, r)
+	case method == "POST" && path == "/data/proyek/editor":
+		controller.PostDataEditorProject(w, r)
 	//upload cover,draft,pdf,sampul buku project
 	case method == "POST" && at.URLParam(path, "/upload/coverbuku/:projectid"):
 		controller.UploadCoverBukuWithParamFileHandler(w, r)

@@ -94,6 +94,15 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	} else if existingUser.PhoneNumber != "" {
+		existingUser.Email = userInfo.Email
+		existingUser.GoogleProfilePicture = userInfo.GoogleProfilePicture
+		_, err := atdb.ReplaceOneDoc(config.Mongoconn, "user", bson.M{"_id": existingUser.ID}, existingUser)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadGateway)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Database Connection Problem: Unable to update user"})
+			return
+		}
 		response := map[string]interface{}{
 			"message": "Authenticated successfully",
 			"user":    existingUser,
