@@ -12,6 +12,8 @@ import (
 
 var PrivateKey string = os.Getenv("PRKEY")
 
+var AESKey string = os.Getenv("AESKEY")
+
 var IPPort, Net = at.GetAddress()
 
 var PhoneNumber string = os.Getenv("PHONENUMBER")
