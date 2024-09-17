@@ -653,3 +653,63 @@ func DeleteDataMenuProject(respw http.ResponseWriter, req *http.Request) {
 
 	at.WriteJSON(respw, http.StatusOK, existingprj)
 }
+
+func DeleteDataMemberProject(respw http.ResponseWriter, req *http.Request) {
+	var respn model.Response
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
+	if err != nil {
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(req)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+
+	var requestPayload struct {
+		ProjectName string `json:"project_name"`
+		PhoneNumber string `json:"phone_number"`
+	}
+
+	err = json.NewDecoder(req.Body).Decode(&requestPayload)
+	if err != nil {
+		respn.Status = "Error : Body tidak valid"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+
+	docuserowner, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		respn.Status = "Error : Data owner tidak ditemukan"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+
+	existingprj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": requestPayload.ProjectName, "owner._id": docuserowner.ID})
+	if err != nil {
+		respn.Status = "Error : Data project tidak ditemukan"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
+
+	// Menghapus member dari project
+	memberToDelete := model.Userdomyikado{PhoneNumber: requestPayload.PhoneNumber}
+	rest, err := atdb.DeleteDocFromArray[model.Userdomyikado](config.Mongoconn, "project", existingprj.ID, "members", memberToDelete)
+	if err != nil {
+		respn.Status = "Error : Gagal menghapus member dari project"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusExpectationFailed, respn)
+		return
+	}
+	if rest.ModifiedCount == 0 {
+		respn.Status = "Error : Gagal menghapus member dari project"
+		respn.Response = "Tidak ada perubahan pada dokumen proyek"
+		at.WriteJSON(respw, http.StatusExpectationFailed, respn)
+		return
+	}
+
+	at.WriteJSON(respw, http.StatusOK, existingprj)
+}
