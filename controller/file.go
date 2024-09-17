@@ -9,6 +9,7 @@ import (
 	"github.com/gocroot/config"
 	"github.com/gocroot/helper/at"
 	"github.com/gocroot/helper/atdb"
+	"github.com/gocroot/helper/dokped"
 	"github.com/gocroot/helper/ghupload"
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
@@ -69,6 +70,61 @@ func AksesFileRepoDraft(w http.ResponseWriter, r *http.Request) {
 		respn.Status = "Error : Data tidak bisa diambil dari github"
 		respn.Info = githubOrg + "/" + githubRepo
 		respn.Location = pathFile
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
+		return
+	}
+	at.WriteFile(w, http.StatusOK, filecontent)
+}
+
+func GetFileDraftSPK(w http.ResponseWriter, r *http.Request) {
+	var respn model.Response
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
+	if err != nil {
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(r)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusForbidden, respn)
+		return
+	}
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		respn.Status = "Error : Data user tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	pathFileBase64 := at.GetParam(r)
+	// Decode string dari Base64
+	decoded, err := base64.StdEncoding.DecodeString(pathFileBase64)
+	if err != nil {
+		respn.Status = "Error : decoding base64"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	namaprj := string(decoded)
+	//cek apakah user memiliki akses ke project
+	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": namaprj})
+	if err != nil {
+		respn.Status = "Error : Data lapak tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	//check apakah dia owner
+	if prj.Owner.PhoneNumber != docuser.PhoneNumber {
+		respn.Status = "Error : User bukan owner project tidak berhak"
+		respn.Response = "User bukan owner dari project ini"
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	filecontent, err := dokped.GenerateSPK(prj, config.AESKey)
+	if err != nil {
+		respn.Status = "Error : Dokumen gagal di generate"
+		respn.Info = prj.Name
+		respn.Location = prj.ID.Hex()
 		respn.Response = err.Error()
 		at.WriteJSON(w, http.StatusBadRequest, respn)
 		return

@@ -1,9 +1,11 @@
 package dokped
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +16,12 @@ import (
 	"github.com/jung-kurt/gofpdf"
 )
 
-func GenerateSPK(user model.Userdomyikado, project model.Project, strkey string) (err error) {
+func GenerateSPK(project model.Project, strkey string) (filecontent []byte, err error) {
+	if len(project.Members) == 0 {
+		err = errors.New("penulis belum di set pada project ini")
+		return
+	}
+	user := project.Members[0]
 	// Define the AES key (must be 32 bytes for AES-256)
 	key := []byte(strkey) // Replace with a secure key
 	// Download the logo image from a URL
@@ -280,10 +287,14 @@ www.bukupedia.co.id`, "", "L", false)
 	pdf.CellFormat(90, 5, "Rolly Maulana Awangga", "", 1, "C", false, 0, "") // Name under Pihak Kesatu
 
 	// Output the PDF to a file
-	err = pdf.OutputFileAndClose("perjanjian_document_with_pasal1_aligned_numbers.pdf")
+	//err = pdf.OutputFileAndClose("perjanjian_document_with_pasal1_aligned_numbers.pdf")
+	// Create an in-memory buffer to store the PDF
+	var buf bytes.Buffer
+	err = pdf.Output(&buf)
 	if err != nil {
 		return
 	}
+	filecontent = buf.Bytes()
 	return
 }
 

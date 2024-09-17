@@ -130,6 +130,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.AksesFileRepoDraft(w, r)
 	case method == "POST" && path == "/data/proyek/katalog": //post blog katalog
 		controller.PostKatalogBuku(w, r)
+	case method == "GET" && at.URLParam(path, "/download/dokped/spk/:path"): //namaproject
+		controller.GetFileDraftSPK(w, r)
 
 	case method == "POST" && path == "/data/proyek/menu":
 		controller.PostDataMenuProject(w, r)
