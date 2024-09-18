@@ -109,7 +109,7 @@ func PostKatalogBuku(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusConflict, respn)
 		return
 	}
-	at.WriteJSON(respw, http.StatusOK, docuser)
+	at.WriteJSON(respw, http.StatusOK, project)
 }
 
 func PostDataProject(respw http.ResponseWriter, req *http.Request) {
