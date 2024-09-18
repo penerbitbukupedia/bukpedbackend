@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"bytes"
 	"encoding/base64"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gocroot/config"
@@ -13,6 +15,7 @@ import (
 	"github.com/gocroot/helper/ghupload"
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
+	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -130,6 +133,145 @@ func GetFileDraftSPK(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	at.WriteFile(w, http.StatusOK, filecontent)
+}
+
+func GetFileDraftSPI(w http.ResponseWriter, r *http.Request) {
+	var respn model.Response
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
+	if err != nil {
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(r)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusForbidden, respn)
+		return
+	}
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		respn.Status = "Error : Data user tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	pathFileBase64 := at.GetParam(r)
+	// Decode string dari Base64
+	decoded, err := base64.StdEncoding.DecodeString(pathFileBase64)
+	if err != nil {
+		respn.Status = "Error : decoding base64"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	pathFile := string(decoded)
+	pathslice := strings.Split(pathFile, "/")
+	namaprj := pathslice[0]
+	//cek apakah user memiliki akses ke project
+	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": namaprj})
+	if err != nil {
+		respn.Status = "Error : Data lapak tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	//check apakah dia owner
+	if prj.Owner.PhoneNumber != docuser.PhoneNumber {
+		respn.Status = "Error : User bukan owner project tidak berhak"
+		respn.Response = "User bukan owner dari project ini"
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	//ambil surat pengantar
+	filecontentpengantar, err := dokped.GenerateSPI(prj, config.AESKey)
+	if err != nil {
+		respn.Status = "Error : Dokumen gagal di generate"
+		respn.Info = prj.Name
+		respn.Location = prj.ID.Hex()
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
+		return
+	}
+	//gabungkan dengan pdf sampul
+	githubOrg := "penerbitbukupedia"
+	githubRepo := "draft"
+	filecontentsampul, err := ghupload.GithubGetFile(config.GHAccessToken, githubOrg, githubRepo, pathFile)
+	if err != nil {
+		respn.Status = "Error : Data tidak bisa diambil dari github"
+		respn.Info = githubOrg + "/" + githubRepo
+		respn.Location = pathFile
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
+		return
+	}
+	filecontent, err := MergePDFBytes(filecontentpengantar, filecontentsampul)
+	if err != nil {
+		respn.Status = "Error : Dokumen gagal di merge"
+		respn.Info = prj.Name
+		respn.Location = prj.ID.Hex()
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
+		return
+	}
+	at.WriteFile(w, http.StatusOK, filecontent)
+}
+
+// MergePDFBytes merges two PDF files provided as []byte and returns the merged result as []byte.
+func MergePDFBytes(pdf1, pdf2 []byte) ([]byte, error) {
+	// Create in-memory buffers for input PDFs
+	input1 := bytes.NewReader(pdf1)
+	input2 := bytes.NewReader(pdf2)
+
+	// Create temporary files to save in-memory PDFs (pdfcpu works with file paths)
+	tmpFile1, err := os.CreateTemp("", "pdf1_*.pdf")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile1.Name()) // Clean up the temporary file
+
+	tmpFile2, err := os.CreateTemp("", "pdf2_*.pdf")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile2.Name()) // Clean up the temporary file
+
+	// Write the in-memory bytes to temporary files
+	if _, err := io.Copy(tmpFile1, input1); err != nil {
+		return nil, err
+	}
+	if _, err := io.Copy(tmpFile2, input2); err != nil {
+		return nil, err
+	}
+
+	// Close the files so they can be read later by pdfcpu
+	if err := tmpFile1.Close(); err != nil {
+		return nil, err
+	}
+	if err := tmpFile2.Close(); err != nil {
+		return nil, err
+	}
+
+	// Create another temporary file to store the merged output
+	mergedFile, err := os.CreateTemp("", "merged_*.pdf")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(mergedFile.Name()) // Clean up the temporary file
+
+	// Prepare the input files for merging
+	inputFiles := []string{tmpFile1.Name(), tmpFile2.Name()}
+
+	// Call the Merge function with the correct arguments
+	err = api.Merge(mergedFile.Name(), inputFiles, nil, nil, false)
+	if err != nil {
+		return nil, err
+	}
+
+	// Read the merged PDF into memory and return it as []byte
+	mergedPDF, err := os.ReadFile(mergedFile.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	return mergedPDF, nil
 }
 
 func UploadProfilePictureHandler(w http.ResponseWriter, r *http.Request) {
