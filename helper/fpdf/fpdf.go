@@ -2,62 +2,69 @@ package fpdf
 
 import (
 	"bytes"
-	"fmt"
+	"io"
+	"os"
 
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/pkg/errors"
 )
 
 // MergePDFBytes merges two PDF files provided as []byte and returns the merged result as []byte.
 func MergePDFBytes(pdf1, pdf2 []byte) ([]byte, error) {
-	// Load first PDF from []byte
-	reader1 := bytes.NewReader(pdf1)
-	pdfReader1, err := model.NewPdfReader(reader1)
+	// Create in-memory buffers for input PDFs
+	input1 := bytes.NewReader(pdf1)
+	input2 := bytes.NewReader(pdf2)
+
+	// Create temporary files to save in-memory PDFs (pdfcpu works with file paths)
+	tmpFile1, err := os.CreateTemp("", "pdf1_*.pdf")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read pdf1: %v", err)
+		return nil, errors.Wrap(err, "failed to create temp file for pdf1")
 	}
+	defer os.Remove(tmpFile1.Name()) // Clean up the temporary file
 
-	// Load second PDF from []byte
-	reader2 := bytes.NewReader(pdf2)
-	pdfReader2, err := model.NewPdfReader(reader2)
+	tmpFile2, err := os.CreateTemp("", "pdf2_*.pdf")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read pdf2: %v", err)
+		return nil, errors.Wrap(err, "failed to create temp file for pdf2")
+	}
+	defer os.Remove(tmpFile2.Name()) // Clean up the temporary file
+
+	// Write the in-memory bytes to temporary files
+	if _, err := io.Copy(tmpFile1, input1); err != nil {
+		return nil, errors.Wrap(err, "failed to copy pdf1 data to temp file")
+	}
+	if _, err := io.Copy(tmpFile2, input2); err != nil {
+		return nil, errors.Wrap(err, "failed to copy pdf2 data to temp file")
 	}
 
-	// Create a new PDF writer to merge into
-	pdfWriter := model.NewPdfWriter()
+	// Close the files so they can be read later by pdfcpu
+	if err := tmpFile1.Close(); err != nil {
+		return nil, errors.Wrap(err, "failed to close temp file for pdf1")
+	}
+	if err := tmpFile2.Close(); err != nil {
+		return nil, errors.Wrap(err, "failed to close temp file for pdf2")
+	}
 
-	// Append all pages from the first PDF
-	numPages1, err := pdfReader1.GetNumPages()
+	// Create another temporary file to store the merged output
+	mergedFile, err := os.CreateTemp("", "merged_*.pdf")
 	if err != nil {
-		return nil, fmt.Errorf("failed to get number of pages in pdf1: %v", err)
+		return nil, errors.Wrap(err, "failed to create temp file for merged PDF")
 	}
-	for i := 1; i <= numPages1; i++ {
-		page, err := pdfReader1.GetPage(i)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get page %d from pdf1: %v", i, err)
-		}
-		pdfWriter.AddPage(page)
-	}
+	defer os.Remove(mergedFile.Name()) // Clean up the temporary file after reading it
 
-	// Append all pages from the second PDF
-	numPages2, err := pdfReader2.GetNumPages()
+	// Prepare the input files for merging
+	inputFiles := []string{tmpFile1.Name(), tmpFile2.Name()}
+
+	// Call the pdfcpu.Merge function to merge the PDFs
+	err = api.Merge(mergedFile.Name(), inputFiles, nil, nil, false)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get number of pages in pdf2: %v", err)
-	}
-	for i := 1; i <= numPages2; i++ {
-		page, err := pdfReader2.GetPage(i)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get page %d from pdf2: %v", i, err)
-		}
-		pdfWriter.AddPage(page)
+		return nil, errors.Wrap(err, "failed to merge PDFs")
 	}
 
-	// Write the merged PDF to a buffer
-	var buf bytes.Buffer
-	err = pdfWriter.Write(&buf)
+	// Read the merged PDF into memory and return it as []byte
+	mergedPDF, err := os.ReadFile(mergedFile.Name())
 	if err != nil {
-		return nil, fmt.Errorf("failed to write merged PDF: %v", err)
+		return nil, errors.Wrap(err, "failed to read merged PDF file")
 	}
 
-	return buf.Bytes(), nil
+	return mergedPDF, nil
 }
