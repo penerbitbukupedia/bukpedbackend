@@ -16,6 +16,7 @@ import (
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -223,52 +224,52 @@ func MergePDFBytes(pdf1, pdf2 []byte) ([]byte, error) {
 	// Create temporary files to save in-memory PDFs (pdfcpu works with file paths)
 	tmpFile1, err := os.CreateTemp("", "pdf1_*.pdf")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create temp file for pdf1")
 	}
 	defer os.Remove(tmpFile1.Name()) // Clean up the temporary file
 
 	tmpFile2, err := os.CreateTemp("", "pdf2_*.pdf")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create temp file for pdf2")
 	}
 	defer os.Remove(tmpFile2.Name()) // Clean up the temporary file
 
 	// Write the in-memory bytes to temporary files
 	if _, err := io.Copy(tmpFile1, input1); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to copy pdf1 data to temp file")
 	}
 	if _, err := io.Copy(tmpFile2, input2); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to copy pdf2 data to temp file")
 	}
 
 	// Close the files so they can be read later by pdfcpu
 	if err := tmpFile1.Close(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to close temp file for pdf1")
 	}
 	if err := tmpFile2.Close(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to close temp file for pdf2")
 	}
 
 	// Create another temporary file to store the merged output
 	mergedFile, err := os.CreateTemp("", "merged_*.pdf")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create temp file for merged PDF")
 	}
-	defer os.Remove(mergedFile.Name()) // Clean up the temporary file
+	defer os.Remove(mergedFile.Name()) // Clean up the temporary file after reading it
 
 	// Prepare the input files for merging
 	inputFiles := []string{tmpFile1.Name(), tmpFile2.Name()}
 
-	// Call the Merge function with the correct arguments
-	err = api.Merge(mergedFile.Name(), inputFiles, nil, nil, false)
+	// Call the pdfcpu.Merge function to merge the PDFs
+	err = api.Merge(mergedFile.Name(), inputFiles, os.Stdout, nil, false) // Providing all the required arguments
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to merge PDFs")
 	}
 
 	// Read the merged PDF into memory and return it as []byte
 	mergedPDF, err := os.ReadFile(mergedFile.Name())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to read merged PDF file")
 	}
 
 	return mergedPDF, nil
