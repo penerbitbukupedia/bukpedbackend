@@ -1,22 +1,19 @@
 package controller
 
 import (
-	"bytes"
 	"encoding/base64"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gocroot/config"
 	"github.com/gocroot/helper/at"
 	"github.com/gocroot/helper/atdb"
 	"github.com/gocroot/helper/dokped"
+	"github.com/gocroot/helper/fpdf"
 	"github.com/gocroot/helper/ghupload"
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
-	"github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -203,7 +200,7 @@ func GetFileDraftSPI(w http.ResponseWriter, r *http.Request) {
 		at.WriteJSON(w, http.StatusBadRequest, respn)
 		return
 	}
-	filecontent, err := MergePDFBytes(filecontentpengantar, filecontentsampul)
+	filecontent, err := fpdf.MergePDFBytes(filecontentpengantar, filecontentsampul)
 	if err != nil {
 		respn.Status = "Error : Dokumen gagal di merge"
 		respn.Info = prj.Name
@@ -213,66 +210,6 @@ func GetFileDraftSPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	at.WriteFile(w, http.StatusOK, filecontent)
-}
-
-// MergePDFBytes merges two PDF files provided as []byte and returns the merged result as []byte.
-func MergePDFBytes(pdf1, pdf2 []byte) ([]byte, error) {
-	// Create in-memory buffers for input PDFs
-	input1 := bytes.NewReader(pdf1)
-	input2 := bytes.NewReader(pdf2)
-
-	// Create temporary files to save in-memory PDFs (pdfcpu works with file paths)
-	tmpFile1, err := os.CreateTemp("", "pdf1_*.pdf")
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create temp file for pdf1")
-	}
-	defer os.Remove(tmpFile1.Name()) // Clean up the temporary file
-
-	tmpFile2, err := os.CreateTemp("", "pdf2_*.pdf")
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create temp file for pdf2")
-	}
-	defer os.Remove(tmpFile2.Name()) // Clean up the temporary file
-
-	// Write the in-memory bytes to temporary files
-	if _, err := io.Copy(tmpFile1, input1); err != nil {
-		return nil, errors.Wrap(err, "failed to copy pdf1 data to temp file")
-	}
-	if _, err := io.Copy(tmpFile2, input2); err != nil {
-		return nil, errors.Wrap(err, "failed to copy pdf2 data to temp file")
-	}
-
-	// Close the files so they can be read later by pdfcpu
-	if err := tmpFile1.Close(); err != nil {
-		return nil, errors.Wrap(err, "failed to close temp file for pdf1")
-	}
-	if err := tmpFile2.Close(); err != nil {
-		return nil, errors.Wrap(err, "failed to close temp file for pdf2")
-	}
-
-	// Create another temporary file to store the merged output
-	mergedFile, err := os.CreateTemp("", "merged_*.pdf")
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create temp file for merged PDF")
-	}
-	defer os.Remove(mergedFile.Name()) // Clean up the temporary file after reading it
-
-	// Prepare the input files for merging
-	inputFiles := []string{tmpFile1.Name(), tmpFile2.Name()}
-
-	// Call the pdfcpu.Merge function to merge the PDFs
-	err = api.Merge(mergedFile.Name(), inputFiles, os.Stdout, nil, false) // Providing all the required arguments
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to merge PDFs")
-	}
-
-	// Read the merged PDF into memory and return it as []byte
-	mergedPDF, err := os.ReadFile(mergedFile.Name())
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read merged PDF file")
-	}
-
-	return mergedPDF, nil
 }
 
 func UploadProfilePictureHandler(w http.ResponseWriter, r *http.Request) {
