@@ -10,7 +10,6 @@ import (
 	"github.com/gocroot/helper/at"
 	"github.com/gocroot/helper/atdb"
 	"github.com/gocroot/helper/dokped"
-	"github.com/gocroot/helper/fpdf"
 	"github.com/gocroot/helper/ghupload"
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
@@ -189,7 +188,7 @@ func GetFileDraftSPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//gabungkan dengan pdf sampul
-	githubOrg := "penerbitbukupedia"
+	/* githubOrg := "penerbitbukupedia"
 	githubRepo := "draft"
 	filecontentsampul, err := ghupload.GithubGetFile(config.GHAccessToken, githubOrg, githubRepo, pathFile)
 	if err != nil {
@@ -208,8 +207,8 @@ func GetFileDraftSPI(w http.ResponseWriter, r *http.Request) {
 		respn.Response = err.Error()
 		at.WriteJSON(w, http.StatusBadRequest, respn)
 		return
-	}
-	at.WriteFile(w, http.StatusOK, filecontent)
+	} */
+	at.WriteFile(w, http.StatusOK, filecontentpengantar)
 }
 
 func UploadProfilePictureHandler(w http.ResponseWriter, r *http.Request) {
