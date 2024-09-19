@@ -54,8 +54,15 @@ func MergePDFBytes(pdf1, pdf2 []byte) ([]byte, error) {
 	// Prepare the input files for merging
 	inputFiles := []string{tmpFile1.Name(), tmpFile2.Name()}
 
+	// Use the os.Create to ensure w is a valid io.Writer (output file writer)
+	outFile, err := os.Create(mergedFile.Name()) // Create the output file for the merged PDF
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create output file for merged PDF")
+	}
+	defer outFile.Close() // Ensure the file is closed after the merge
+
 	// Call the pdfcpu.Merge function to merge the PDFs
-	err = api.Merge(mergedFile.Name(), inputFiles, nil, nil, false)
+	err = api.Merge(mergedFile.Name(), inputFiles, outFile, nil, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to merge PDFs")
 	}
