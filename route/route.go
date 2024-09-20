@@ -126,6 +126,9 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.UploadDraftBukuPDFWithParamFileHandler(w, r)
 	case method == "POST" && at.URLParam(path, "/upload/sampulpdfbuku/:projectid"):
 		controller.UploadSampulBukuPDFWithParamFileHandler(w, r)
+	case method == "POST" && at.URLParam(path, "/upload/spk/:projectid"):
+		controller.UploadSPKPDFWithParamFileHandler(w, r)
+
 	case method == "GET" && at.URLParam(path, "/download/draft/:path"): //downoad file draft
 		controller.AksesFileRepoDraft(w, r)
 	case method == "POST" && path == "/data/proyek/katalog": //post blog katalog
