@@ -677,7 +677,7 @@ func UploadSPKPDFWithParamFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with success message
 	respn.Info = prj.ID.Hex()
-	respn.Location = prj.DraftPDFBuku
+	respn.Location = prj.SPK
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
@@ -760,7 +760,7 @@ func UploadSPIPDFWithParamFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with success message
 	respn.Info = prj.ID.Hex()
-	respn.Location = prj.DraftPDFBuku
+	respn.Location = prj.SPI
 	respn.Response = *content.Content.URL
 	respn.Status = *content.Content.HTMLURL
 	at.WriteJSON(w, http.StatusOK, respn)
