@@ -107,6 +107,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.PostDataProject(w, r)
 	case method == "PUT" && path == "/data/metadatabuku":
 		controller.PutMetaDataProject(w, r)
+	case method == "PUT" && path == "/data/proyek/publishbuku": //publish buku isbn by manager
+		controller.PutPublishProject(w, r)
 	case method == "PUT" && path == "/data/proyek":
 		controller.PutDataProject(w, r)
 	case method == "DELETE" && path == "/data/proyek":

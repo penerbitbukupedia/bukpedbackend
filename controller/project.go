@@ -304,6 +304,75 @@ func PutMetaDataProject(respw http.ResponseWriter, req *http.Request) {
 	at.WriteJSON(respw, http.StatusOK, prj)
 }
 
+func PutPublishProject(respw http.ResponseWriter, req *http.Request) {
+	// Decode token from header
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error: Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(req)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+
+	// Decode the project data from the request body
+	var prj model.Project
+	err = json.NewDecoder(req.Body).Decode(&prj)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error: Body tidak valid"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+
+	// Get user data from the database and make sure its manager
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id, "ismanager": true})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Tidak ada akses"
+		respn.Response = "Kakak bukan manager"
+		at.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+
+	// ambil data project
+	existingprj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"_id": prj.ID})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error: Project tidak ditemukan"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
+
+	// modif hanya publisher data saja
+	existingprj.ISBN = prj.ISBN
+	existingprj.Terbit = prj.Terbit
+	existingprj.LinkPlayBook = prj.LinkPlayBook
+	existingprj.LinkGramed = prj.LinkGramed
+	existingprj.LinkKubuku = prj.LinkMyedisi
+	existingprj.LinkMyedisi = prj.LinkMyedisi
+	existingprj.LinkDepositPerpusnas = prj.LinkDepositPerpusnas
+	existingprj.LinkDepositPerpusda = prj.LinkDepositPerpusda
+	existingprj.Manager = docuser
+
+	// Save the updated project back to the database using ReplaceOneDoc
+	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "project", primitive.M{"_id": existingprj.ID}, existingprj)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error: Gagal memperbarui database"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusInternalServerError, respn)
+		return
+	}
+
+	// Return the updated project
+	at.WriteJSON(respw, http.StatusOK, prj)
+}
+
 func PutDataProject(respw http.ResponseWriter, req *http.Request) {
 	// Decode token from header
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))

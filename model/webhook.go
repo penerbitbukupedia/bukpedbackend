@@ -42,38 +42,41 @@ type PushReport struct {
 }
 
 type Project struct {
-	ID             primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Secret         string             `bson:"secret,omitempty" json:"secret,omitempty"`
-	Name           string             `bson:"name" json:"name"`
-	Title          string             `bson:"title" json:"title"`
-	Description    string             `bson:"description" json:"description"`
-	KalimatPromosi string             `bson:"kalimatpromosi" json:"kalimatpromosi"`
-	Owner          Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
-	Editor         Userdomyikado      `bson:"editor,omitempty" json:"editor,omitempty"`
-	IsApproved     bool               `bson:"isapproved,omitempty" json:"isapproved,omitempty"`
-	WAGroupID      string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
-	RepoOrg        string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
-	RepoLogName    string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
-	CoverBuku      string             `bson:"coverbuku,omitempty" json:"coverbuku,omitempty"`
-	DraftBuku      string             `bson:"draftbuku,omitempty" json:"draftbuku,omitempty"`
-	DraftPDFBuku   string             `bson:"draftpdfbuku,omitempty" json:"draftpdfbuku,omitempty"`
-	SampulPDFBuku  string             `bson:"sampulpdfbuku,omitempty" json:"sampulpdfbuku,omitempty"`
-	URLKatalog     string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
-	PATHKatalog    string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
-	SPK            string             `bson:"spk,omitempty" json:"spk,omitempty"`
-	SPI            string             `bson:"spi,omitempty" json:"spi,omitempty"`
-	ISBN           string             `bson:"isbn,omitempty" json:"isbn,omitempty"`
-	Terbit         string             `bson:"terbit,omitempty" json:"terbit,omitempty"`
-	Ukuran         string             `bson:"ukuran,omitempty" json:"ukuran,omitempty"`
-	JumlahHalaman  string             `bson:"jumlahhalaman,omitempty" json:"jumlahhalaman,omitempty"`
-	Tebal          string             `bson:"tebal,omitempty" json:"tebal,omitempty"`
-	LinkGramed     string             `bson:"linkgramed,omitempty" json:"linkgramed,omitempty"`
-	LinkPlayBook   string             `bson:"linkplaybook,omitempty" json:"linkplaybook,omitempty"`
-	LinkKubuku     string             `bson:"linkkubuku,omitempty" json:"linkkubuku,omitempty"`
-	LinkMyedisi    string             `bson:"linkmyedisi,omitempty" json:"linkmyedisi,omitempty"`
-	Menu           []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
-	Members        []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
-	Closed         bool               `bson:"closed,omitempty" json:"closed,omitempty"`
+	ID                   primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Secret               string             `bson:"secret,omitempty" json:"secret,omitempty"`
+	Name                 string             `bson:"name" json:"name"`
+	Title                string             `bson:"title" json:"title"`
+	Description          string             `bson:"description" json:"description"`
+	KalimatPromosi       string             `bson:"kalimatpromosi" json:"kalimatpromosi"`
+	Owner                Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
+	Editor               Userdomyikado      `bson:"editor,omitempty" json:"editor,omitempty"`
+	Manager              Userdomyikado      `bson:"manager,omitempty" json:"manager,omitempty"`
+	IsApproved           bool               `bson:"isapproved,omitempty" json:"isapproved,omitempty"`
+	WAGroupID            string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
+	RepoOrg              string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
+	RepoLogName          string             `bson:"repologname,omitempty" json:"repologname,omitempty"`
+	CoverBuku            string             `bson:"coverbuku,omitempty" json:"coverbuku,omitempty"`
+	DraftBuku            string             `bson:"draftbuku,omitempty" json:"draftbuku,omitempty"`
+	DraftPDFBuku         string             `bson:"draftpdfbuku,omitempty" json:"draftpdfbuku,omitempty"`
+	SampulPDFBuku        string             `bson:"sampulpdfbuku,omitempty" json:"sampulpdfbuku,omitempty"`
+	URLKatalog           string             `bson:"urlkatalog,omitempty" json:"urlkatalog,omitempty"`
+	PATHKatalog          string             `bson:"pathkatalog,omitempty" json:"pathkatalog,omitempty"`
+	SPK                  string             `bson:"spk,omitempty" json:"spk,omitempty"`
+	SPI                  string             `bson:"spi,omitempty" json:"spi,omitempty"`
+	ISBN                 string             `bson:"isbn,omitempty" json:"isbn,omitempty"`
+	Terbit               string             `bson:"terbit,omitempty" json:"terbit,omitempty"`
+	Ukuran               string             `bson:"ukuran,omitempty" json:"ukuran,omitempty"`
+	JumlahHalaman        string             `bson:"jumlahhalaman,omitempty" json:"jumlahhalaman,omitempty"`
+	Tebal                string             `bson:"tebal,omitempty" json:"tebal,omitempty"`
+	LinkGramed           string             `bson:"linkgramed,omitempty" json:"linkgramed,omitempty"`
+	LinkPlayBook         string             `bson:"linkplaybook,omitempty" json:"linkplaybook,omitempty"`
+	LinkKubuku           string             `bson:"linkkubuku,omitempty" json:"linkkubuku,omitempty"`
+	LinkMyedisi          string             `bson:"linkmyedisi,omitempty" json:"linkmyedisi,omitempty"`
+	LinkDepositPerpusnas string             `bson:"linkdepositperpusnas,omitempty" json:"linkdepositperpusnas,omitempty"`
+	LinkDepositPerpusda  string             `bson:"linkdepositperpusda,omitempty" json:"linkdepositperpusda,omitempty"`
+	Menu                 []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
+	Members              []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
+	Closed               bool               `bson:"closed,omitempty" json:"closed,omitempty"`
 }
 
 type MenuItem struct {
