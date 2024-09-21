@@ -109,6 +109,7 @@ type Userdomyikado struct {
 	LinkedDevice         string             `json:"linkeddevice,omitempty" bson:"linkeddevice,omitempty"`
 	JumlahAntrian        int                `json:"jumlahantrian,omitempty" bson:"jumlahantrian,omitempty"`
 	IsEditor             bool               `json:"iseditor,omitempty" bson:"iseditor,omitempty"`
+	IsManager            bool               `json:"ismanager,omitempty" bson:"ismanager,omitempty"`
 }
 
 type Task struct {

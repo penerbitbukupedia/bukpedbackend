@@ -202,6 +202,45 @@ func GetDataProject(respw http.ResponseWriter, req *http.Request) {
 	at.WriteJSON(respw, http.StatusOK, existingprjs)
 }
 
+// untuk manager
+func GetEditorApprovedProject(respw http.ResponseWriter, req *http.Request) {
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(req)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+	//akses khusus manager
+	_, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id, "ismanager": true})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data user tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+	existingprjs, err := atdb.GetAllDoc[[]model.Project](config.Mongoconn, "project", primitive.M{"isapproved": true})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data project yang di approve tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
+	if len(existingprjs) == 0 {
+		var respn model.Response
+		respn.Status = "Error : Data project yang di approve tidak di temukan"
+		respn.Response = "Kakak belum input proyek, silahkan input dulu ya"
+		at.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
+	at.WriteJSON(respw, http.StatusOK, existingprjs)
+}
+
 func PutMetaDataProject(respw http.ResponseWriter, req *http.Request) {
 	// Decode token from header
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(req))
