@@ -50,6 +50,7 @@ type Project struct {
 	KalimatPromosi string             `bson:"kalimatpromosi" json:"kalimatpromosi"`
 	Owner          Userdomyikado      `bson:"owner,omitempty" json:"owner,omitempty"`
 	Editor         Userdomyikado      `bson:"editor,omitempty" json:"editor,omitempty"`
+	IsApproved     bool               `bson:"isapproved,omitempty" json:"isapproved,omitempty"`
 	WAGroupID      string             `bson:"wagroupid,omitempty" json:"wagroupid,omitempty"`
 	RepoOrg        string             `bson:"repoorg,omitempty" json:"repoorg,omitempty"`
 	RepoLogName    string             `bson:"repologname,omitempty" json:"repologname,omitempty"`

@@ -117,8 +117,10 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.DeleteDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek/anggota":
 		controller.PostDataMemberProject(w, r)
-	case method == "POST" && path == "/data/proyek/editor":
+	case method == "POST" && path == "/data/proyek/editor": //set editor oleh owner
 		controller.PostDataEditorProject(w, r)
+	case method == "PUT" && path == "/data/proyek/editor": //set approved oleh editor
+		controller.PUtApprovedEditorProject(w, r)
 	//upload cover,draft,pdf,sampul buku project
 	case method == "POST" && at.URLParam(path, "/upload/coverbuku/:projectid"):
 		controller.UploadCoverBukuWithParamFileHandler(w, r)
