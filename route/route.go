@@ -101,6 +101,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	//data proyek
 	case method == "GET" && path == "/data/proyek":
 		controller.GetDataProject(w, r)
+	case method == "GET" && path == "/data/proyek/approved": //akses untuk manager
+		controller.GetEditorApprovedProject(w, r)
 	case method == "POST" && path == "/data/proyek":
 		controller.PostDataProject(w, r)
 	case method == "PUT" && path == "/data/metadatabuku":
