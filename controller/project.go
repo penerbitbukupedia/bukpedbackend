@@ -218,8 +218,8 @@ func GetEditorApprovedProject(respw http.ResponseWriter, req *http.Request) {
 	_, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id, "ismanager": true})
 	if err != nil {
 		var respn model.Response
-		respn.Status = "Error : Data user tidak di temukan"
-		respn.Response = err.Error()
+		respn.Status = "Akses dibatasi"
+		respn.Response = "Anda bukan manager bukupedia"
 		at.WriteJSON(respw, http.StatusNotImplemented, respn)
 		return
 	}
