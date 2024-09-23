@@ -31,6 +31,7 @@ func MenuSessionHandler(msg *itmodel.IteungMessage, db *mongo.Database) string {
 		return err.Error()
 	}
 	fmt.Println("Session exists:", ses, "Session document:", Sesdoc) // Debug session state and document
+	fmt.Println("Session Menu List:", Sesdoc.Menulist)
 
 	if !ses { // jika tidak ada session atau session=false maka return menu utama user dan update session isi list nomor menunya
 		reply, err := GetMenuFromKeywordAndSetSession(startmenu, Sesdoc, db)
@@ -98,20 +99,38 @@ func CheckSession(phonenumber string, db *mongo.Database) (session Session, resu
 }
 
 func GetMenuFromKeywordAndSetSession(keyword string, session Session, db *mongo.Database) (msg string, err error) {
+	// Ambil dokumen menu berdasarkan keyword
 	dt, err := atdb.GetOneDoc[Menu](db, "menu", bson.M{"keyword": keyword})
 	if err != nil {
-		return
+		fmt.Println("Error fetching menu from DB with keyword:", keyword, "Error:", err)
+		return "", err
 	}
-	atdb.UpdateOneDoc(db, "session", bson.M{"phonenumber": session.PhoneNumber}, bson.M{"list": dt.List})
+	fmt.Println("Menu data fetched:", dt) // Debug untuk melihat data menu yang diambil
+
+	// Update session dengan list menu dari data yang diambil
+	result, err := atdb.UpdateOneDoc(db, "session", bson.M{"phonenumber": session.PhoneNumber}, bson.M{"list": dt.List})
+	if err != nil {
+		fmt.Println("Error updating session with menu list:", dt.List, "Error:", err)
+		return "", err
+	}
+	fmt.Println("Session updated with menu list:", dt.List, "Result:", result) // Debug untuk memastikan session diupdate
+
+	// Bangun pesan yang akan dikirim ke pengguna
 	msg = dt.Header + "\n"
 	for _, item := range dt.List {
 		msg += strconv.Itoa(item.No) + ". " + item.Konten + "\n"
 	}
 	msg += dt.Footer
+	fmt.Println("Generated message:", msg) // Debug pesan yang dihasilkan
 	return
 }
 
 func InjectSessionMenu(menulist []MenuList, phonenumber string, db *mongo.Database) error {
-	_, err := atdb.UpdateOneDoc(db, "session", bson.M{"phonenumber": phonenumber}, bson.M{"list": menulist})
-	return err
+	result, err := atdb.UpdateOneDoc(db, "session", bson.M{"phonenumber": phonenumber}, bson.M{"list": menulist})
+	if err != nil {
+		fmt.Println("Error injecting session menu list:", menulist, "Error:", err)
+		return err
+	}
+	fmt.Println("Session menu list injected successfully for phone number:", phonenumber, "Result:", result)
+	return nil
 }
