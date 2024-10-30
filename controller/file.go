@@ -57,10 +57,12 @@ func AksesFileRepoDraft(w http.ResponseWriter, r *http.Request) {
 	}
 	//check apakah dia owner
 	if (prj.Owner.PhoneNumber != docuser.PhoneNumber) && (prj.Editor.PhoneNumber != docuser.PhoneNumber) {
-		respn.Status = "Error : User bukan owner project tidak berhak"
-		respn.Response = "User bukan owner dari project ini"
-		at.WriteJSON(w, http.StatusNotImplemented, respn)
-		return
+		if !docuser.IsManager { //kalo bukan manager maka ga punya akses dong
+			respn.Status = "Error : User bukan owner project tidak berhak"
+			respn.Response = "User bukan owner dari project ini"
+			at.WriteJSON(w, http.StatusNotImplemented, respn)
+			return
+		}
 	}
 
 	githubOrg := "penerbitbukupedia"
