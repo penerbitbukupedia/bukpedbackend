@@ -115,6 +115,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.DeleteDataProject(w, r)
 	case method == "GET" && path == "/data/proyek/anggota":
 		controller.GetDataMemberProject(w, r)
+	case method == "GET" && path == "/data/proyek/owner":
+		controller.GetDataOwnerProject(w, r)
 	case method == "GET" && path == "/data/proyek/editor":
 		controller.GetDataEditorProject(w, r)
 	case method == "DELETE" && path == "/data/proyek/anggota":
