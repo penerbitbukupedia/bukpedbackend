@@ -109,7 +109,7 @@ www.bukupedia.co.id`, "", "L", false)
 	// Align "untuk ebook" under "Permohonan" by indenting to the same level
 	pdf.Ln(6)
 	pdf.CellFormat(35, 6, "", "", 0, "L", false, 0, "") // Indent to align with "Permohonan"
-	pdf.CellFormat(100, 6, "untuk ebook", "", 1, "L", false, 0, "")
+	pdf.CellFormat(100, 6, "untuk cetak dan elektronik", "", 1, "L", false, 0, "")
 	pdf.Ln(10) // Line break for spacing
 
 	// Add "Kepada" section
@@ -152,7 +152,7 @@ www.bukupedia.co.id`, "", "L", false)
 	pdf.Ln(2)
 	pdf.Cell(40, 6, "Link/akses")
 	pdf.Cell(5, 6, ":")
-	pdf.MultiCell(0, 6, project.URLKatalog, "", "L", false)
+	pdf.MultiCell(0, 6, project.PATHKatalog, "", "L", false)
 	pdf.Ln(10)
 
 	// Add closing remarks
