@@ -50,8 +50,8 @@ func AksesFileRepoDraft(w http.ResponseWriter, r *http.Request) {
 	//cek apakah user memiliki akses ke project
 	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": namaprj})
 	if err != nil {
-		respn.Status = "Error : Data lapak tidak di temukan"
-		respn.Response = err.Error()
+		respn.Response = "Error : User tidak memiliki akses " + namaprj
+		respn.Status = err.Error()
 		at.WriteJSON(w, http.StatusNotImplemented, respn)
 		return
 	}
