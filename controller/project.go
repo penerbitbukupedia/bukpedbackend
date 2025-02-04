@@ -558,7 +558,7 @@ func GetDataOwnerProject(respw http.ResponseWriter, req *http.Request) {
 		at.WriteJSON(respw, http.StatusNotImplemented, respn)
 		return
 	}
-	existingprjs, err := atdb.GetAllDoc[[]model.Project](config.Mongoconn, "project", primitive.M{"_id": docuser.ID})
+	existingprjs, err := atdb.GetAllDoc[[]model.Project](config.Mongoconn, "project", primitive.M{"owner._id": docuser.ID})
 	if err != nil {
 		var respn model.Response
 		respn.Status = "Error : Data project tidak di temukan"
