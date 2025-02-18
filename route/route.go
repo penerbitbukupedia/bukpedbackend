@@ -146,8 +146,13 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.PostKatalogBuku(w, r)
 	case method == "GET" && at.URLParam(path, "/download/dokped/spk/:namaproject"): //base64 namaproject
 		controller.GetFileDraftSPK(w, r)
+	// cetak SPKT elektronik dan cetak
 	case method == "GET" && at.URLParam(path, "/download/dokped/spkt/:namaproject"): //base64 namaproject
 		controller.GetFileDraftSPKT(w, r)
+	case method == "GET" && at.URLParam(path, "/download/dokped/spkt/daerah/cetak/:namaproject"): //base64 namaproject
+		controller.GetFileDraftSPKTDaerahCetak(w, r)
+	case method == "GET" && at.URLParam(path, "/download/dokped/spkt/nasional/cetak/:namaproject"): //base64 namaproject
+		controller.GetFileDraftSPKTPusatCetak(w, r)
 	case method == "GET" && at.URLParam(path, "/download/dokped/spi/:path"): //base64 path sampul
 		controller.GetFileDraftSPI(w, r)
 

@@ -189,6 +189,116 @@ func GetFileDraftSPKT(w http.ResponseWriter, r *http.Request) {
 	at.WriteFile(w, http.StatusOK, filecontent)
 }
 
+func GetFileDraftSPKTDaerahCetak(w http.ResponseWriter, r *http.Request) {
+	var respn model.Response
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
+	if err != nil {
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(r)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusForbidden, respn)
+		return
+	}
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		respn.Status = "Error : Data user tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	pathFileBase64 := at.GetParam(r)
+	// Decode string dari Base64
+	decoded, err := base64.StdEncoding.DecodeString(pathFileBase64)
+	if err != nil {
+		respn.Status = "Error : decoding base64"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	namaprj := string(decoded)
+	//cek apakah user memiliki akses ke project
+	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": namaprj})
+	if err != nil {
+		respn.Status = "Error : Data lapak tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	//check apakah dia owner
+	if prj.Owner.PhoneNumber != docuser.PhoneNumber {
+		respn.Status = "Error : User bukan owner project tidak berhak"
+		respn.Response = "User bukan owner dari project ini"
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	filecontent, err := dokped.GenerateSPKTDaerahCetak(prj, config.AESKey)
+	if err != nil {
+		respn.Status = "Error : Dokumen gagal di generate"
+		respn.Info = prj.Name
+		respn.Location = prj.ID.Hex()
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
+		return
+	}
+	at.WriteFile(w, http.StatusOK, filecontent)
+}
+
+func GetFileDraftSPKTPusatCetak(w http.ResponseWriter, r *http.Request) {
+	var respn model.Response
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
+	if err != nil {
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = at.GetSecretFromHeader(r)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusForbidden, respn)
+		return
+	}
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		respn.Status = "Error : Data user tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	pathFileBase64 := at.GetParam(r)
+	// Decode string dari Base64
+	decoded, err := base64.StdEncoding.DecodeString(pathFileBase64)
+	if err != nil {
+		respn.Status = "Error : decoding base64"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	namaprj := string(decoded)
+	//cek apakah user memiliki akses ke project
+	prj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": namaprj})
+	if err != nil {
+		respn.Status = "Error : Data lapak tidak di temukan"
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	//check apakah dia owner
+	if prj.Owner.PhoneNumber != docuser.PhoneNumber {
+		respn.Status = "Error : User bukan owner project tidak berhak"
+		respn.Response = "User bukan owner dari project ini"
+		at.WriteJSON(w, http.StatusNotImplemented, respn)
+		return
+	}
+	filecontent, err := dokped.GenerateSPKTPusatCetak(prj, config.AESKey)
+	if err != nil {
+		respn.Status = "Error : Dokumen gagal di generate"
+		respn.Info = prj.Name
+		respn.Location = prj.ID.Hex()
+		respn.Response = err.Error()
+		at.WriteJSON(w, http.StatusBadRequest, respn)
+		return
+	}
+	at.WriteFile(w, http.StatusOK, filecontent)
+}
+
 func GetFileDraftSPI(w http.ResponseWriter, r *http.Request) {
 	var respn model.Response
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, at.GetLoginFromHeader(r))
