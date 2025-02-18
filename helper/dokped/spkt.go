@@ -515,7 +515,7 @@ www.bukupedia.co.id`, "", "L", false)
 Demikian surat pengantar ini kami buat, atas perhatian dan kerjasamanya diucapkan terima kasih.`, "", "L", false)
 
 	// Signature Section
-	pdf.Ln(20) // Add some space before the signature section
+	pdf.Ln(15) // Add some space before the signature section
 	// Set font for the "Hormat kami" text
 	pdf.SetFont("Arial", "", 12)
 
