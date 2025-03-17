@@ -58,12 +58,16 @@ func RegisterGmailAuth(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token: Token verification failed"})
 		return
 	}
+	googleProfilePicture, ok := payload.Claims["picture"].(string)
+	if !ok {
+		googleProfilePicture = "" // atau default value lainnya
+	}
 
 	userInfo := model.Userdomyikado{
 		Name:                 payload.Claims["name"].(string),
 		PhoneNumber:          logintoken.Id,
 		Email:                payload.Claims["email"].(string),
-		GoogleProfilePicture: payload.Claims["picture"].(string),
+		GoogleProfilePicture: googleProfilePicture,
 	}
 
 	// Simpan atau perbarui informasi pengguna di database
