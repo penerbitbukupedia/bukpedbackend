@@ -74,6 +74,7 @@ type Project struct {
 	LinkMyedisi          string             `bson:"linkmyedisi,omitempty" json:"linkmyedisi,omitempty"`
 	LinkDepositPerpusnas string             `bson:"linkdepositperpusnas,omitempty" json:"linkdepositperpusnas,omitempty"`
 	LinkDepositPerpusda  string             `bson:"linkdepositperpusda,omitempty" json:"linkdepositperpusda,omitempty"`
+	NoResiISBN		   	 string             `bson:"noresiisbn,omitempty" json:"noresiisbn,omitempty"`
 	Menu                 []MenuItem         `bson:"menu,omitempty" json:"menu,omitempty"`
 	Members              []Userdomyikado    `bson:"members,omitempty" json:"members,omitempty"`
 	Closed               bool               `bson:"closed,omitempty" json:"closed,omitempty"`

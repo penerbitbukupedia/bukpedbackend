@@ -358,6 +358,7 @@ func PutPublishProject(respw http.ResponseWriter, req *http.Request) {
 	existingprj.LinkDepositPerpusnas = prj.LinkDepositPerpusnas
 	existingprj.LinkDepositPerpusda = prj.LinkDepositPerpusda
 	existingprj.Manager = docuser
+	existingprj.NoResiISBN = prj.NoResiISBN
 
 	// Save the updated project back to the database using ReplaceOneDoc
 	_, err = atdb.ReplaceOneDoc(config.Mongoconn, "project", primitive.M{"_id": existingprj.ID}, existingprj)
